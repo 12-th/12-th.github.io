@@ -1,0 +1,376 @@
+
+<!DOCTYPE html>
+<html>
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="utf-8">
+  
+  <title>用rust写linux模块？(二) | mq&#39;s website</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="用rust写linux模块？ (二)上一篇结尾讲到，重定位报错了。先重复一下上一篇提到的错误： 在换了个内核版本后得到的错误如下：  [ 9839.177419] module: testmodule: Unknown rela relocation: 4  在尝试直接调用printk时得到的错误如下：  [11061.846413] module: testmodule: Unknown rel">
+<meta property="og:type" content="article">
+<meta property="og:title" content="用rust写linux模块？(二)">
+<meta property="og:url" content="http://yoursite.com/2020/03/06/用rust写linux模块？(二)/index.html">
+<meta property="og:site_name" content="mq&#39;s website">
+<meta property="og:description" content="用rust写linux模块？ (二)上一篇结尾讲到，重定位报错了。先重复一下上一篇提到的错误： 在换了个内核版本后得到的错误如下：  [ 9839.177419] module: testmodule: Unknown rela relocation: 4  在尝试直接调用printk时得到的错误如下：  [11061.846413] module: testmodule: Unknown rel">
+<meta property="og:locale" content="en">
+<meta property="og:updated_time" content="2020-03-06T14:24:30.590Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="用rust写linux模块？(二)">
+<meta name="twitter:description" content="用rust写linux模块？ (二)上一篇结尾讲到，重定位报错了。先重复一下上一篇提到的错误： 在换了个内核版本后得到的错误如下：  [ 9839.177419] module: testmodule: Unknown rela relocation: 4  在尝试直接调用printk时得到的错误如下：  [11061.846413] module: testmodule: Unknown rel">
+  
+    <link rel="alternative" href="/atom.xml" title="mq&#39;s website" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  <link rel="stylesheet" href="/css/style.css">
+  <!--[if lt IE 9]><script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7/html5shiv.min.js"></script><![endif]-->
+  
+</head></html>
+<body>
+<div id="container">
+  <div id="wrap">
+    <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">mq&#39;s website</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//www.baidu.com/baidu" method="get" accept-charset="utf-8" class="search-form">
+          <input type="search" name="word" maxlength="20" class="search-form-input" placeholder="Search">
+          <input type="submit" value="" class="search-form-submit">
+          <input name=tn type=hidden value="bds">
+          <input name=cl type=hidden value="3">
+          <input name=ct type=hidden value="2097152">
+          <input type="hidden" name="si" value="yoursite.com">
+        </form>
+      </div>
+    </div>
+  </div>
+</header>
+    <div class="outer">
+      <section id="main"><article id="post-用rust写linux模块？(二)" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2020/03/06/用rust写linux模块？(二)/" class="article-date">
+  <time datetime="2020-03-06T13:00:00.000Z" itemprop="datePublished">2020-03-06</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      用rust写linux模块？(二)
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h1 id="用rust写linux模块？-二"><a href="#用rust写linux模块？-二" class="headerlink" title="用rust写linux模块？ (二)"></a>用rust写linux模块？ (二)</h1><p>上一篇结尾讲到，重定位报错了。先重复一下上一篇提到的错误：</p>
+<p>在换了个内核版本后得到的错误如下：</p>
+<blockquote>
+<p>[ 9839.177419] module: testmodule: Unknown rela relocation: 4</p>
+</blockquote>
+<p>在尝试直接调用printk时得到的错误如下：</p>
+<blockquote>
+<p>[11061.846413] module: testmodule: Unknown rela relocation: 9</p>
+</blockquote>
+<a id="more"></a>
+
+<h2 id="分析"><a href="#分析" class="headerlink" title="分析"></a>分析</h2><p>首先得确认报错原因，dmesg里面给的信息看得云里雾里的，得去代码里面分析分析。把dmesg里面的关键字”Unknown rela relocation”拿去内核源码里面搜，看看是哪个函数在报错。</p>
+<p>在linux源码目录（这里我用的源码版本是4.16.7）中执行<code>grep -rin &quot;Unknown rela relocation&quot;</code>，得到了两个我们想要的结果：</p>
+<blockquote>
+<p>arch/x86/kernel/machine_kexec_64.c:550:                  pr_err(“Unknown rela relocation: %llu\n”,<br>arch/x86/kernel/module.c:205:                    pr_err(“%s: Unknown rela relocation: %llu\n”,</p>
+</blockquote>
+<p>打开module.c，报错位于函数<code>apply_relocate_add</code>中，其中一段处理逻辑长这样：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">switch</span> (ELF64_R_TYPE(rel[i].r_info)) &#123;</span><br><span class="line">		<span class="keyword">case</span> R_X86_64_NONE:</span><br><span class="line">			<span class="keyword">break</span>;</span><br><span class="line">		<span class="keyword">case</span> R_X86_64_64:</span><br><span class="line">			...</span><br><span class="line">			<span class="keyword">break</span>;</span><br><span class="line">		<span class="keyword">case</span> R_X86_64_32:</span><br><span class="line">			...</span><br><span class="line">			<span class="keyword">break</span>;</span><br><span class="line">		<span class="keyword">case</span> R_X86_64_32S:</span><br><span class="line">			...</span><br><span class="line">			<span class="keyword">break</span>;</span><br><span class="line">		<span class="keyword">case</span> R_X86_64_PC32:</span><br><span class="line">		<span class="keyword">case</span> R_X86_64_PLT32:</span><br><span class="line">			...</span><br><span class="line">			<span class="keyword">break</span>;</span><br><span class="line">		<span class="keyword">default</span>:</span><br><span class="line">			pr_err(<span class="string">"%s: Unknown rela relocation: %llu\n"</span>,</span><br><span class="line">			       me-&gt;name, ELF64_R_TYPE(rel[i].r_info));</span><br><span class="line">			<span class="keyword">return</span> -ENOEXEC;</span><br><span class="line">		&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这段代码对不同的重定位方式进行了不同的处理，而我们得到的报错位于default的处理逻辑里面。回看上一章的两个报错，重定位方式的值分别为4和9。继续看内核代码，4和9对应的重定位类型如下：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">define</span> R_X86_64_PLT32		4	<span class="comment">/* 32 bit PLT address */</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> R_X86_64_GOTPCREL	9	<span class="comment">/* 32 bit signed pc relative offset to GOT */</span></span></span><br></pre></td></tr></table></figure>
+
+<p>关键字PLT和GOT。哦哦，也就是说，由于代码在编译时产生了使用PLT和GOT表的代码，但是内核在动态链接时并不支持这种方式。关于PLT和GOT，网上的资料一搜一大把，简单来说，GOT是用来实现地址无关代码(PIC)的关键技术，在编译时，那些要调用外部函数的代码被编译为去查GOT表，然后call从GOT表中得到的函数地址，GOT表由链接器进行修正。PLT作为GOT的优化，在装载时链接器并不立即修正这些地址，而是用PLT表来惰式修正，也就是在第一次call到相应函数时再来修正它的地址。</p>
+<h2 id="错误一的原因"><a href="#错误一的原因" class="headerlink" title="错误一的原因"></a>错误一的原因</h2><p>现在来看第一个错误是怎么产生的。内核不识别R_X86_64_PLT32的重定位方式，但是仔细看代码，case语句中对于R_X86_64_PLT32是进行了错误处理的。emmmmm，错误一是在内核版本4.4上出现的，而我们看的代码是4.16的。去<a href="http://lxr.free-electrons.com/" target="_blank" rel="noopener">lxr</a>上翻一下4.4的代码，如下。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">switch</span> (ELF64_R_TYPE(rel[i].r_info)) &#123;</span><br><span class="line">		<span class="keyword">case</span> R_X86_64_NONE:</span><br><span class="line">        	...</span><br><span class="line">		<span class="keyword">case</span> R_X86_64_64:</span><br><span class="line">			...</span><br><span class="line">		<span class="keyword">case</span> R_X86_64_32:</span><br><span class="line">			...</span><br><span class="line">		<span class="keyword">case</span> R_X86_64_32S:</span><br><span class="line">			...</span><br><span class="line">		<span class="keyword">case</span> R_X86_64_PC32:</span><br><span class="line">			...</span><br><span class="line">		<span class="keyword">default</span>:</span><br><span class="line">			pr_err(<span class="string">"%s: Unknown rela relocation: %llu\n"</span>,</span><br><span class="line">			       me-&gt;name, ELF64_R_TYPE(rel[i].r_info));</span><br><span class="line">			<span class="keyword">return</span> -ENOEXEC;</span><br><span class="line">		&#125;</span><br></pre></td></tr></table></figure>
+
+<p>果然，4.4没处理R_X86_64_PLT32。唉，内核里面的东西太不稳定了，随时都有可能变。</p>
+<h2 id="错误二的原因"><a href="#错误二的原因" class="headerlink" title="错误二的原因"></a>错误二的原因</h2><p>显然，错误二是因为内核不支持R_X86_64_GOTPCREL重定位方式。无论上面哪个版本，都不支持。</p>
+<h2 id="试试C"><a href="#试试C" class="headerlink" title="试试C++"></a>试试C++</h2><p>在分析出错误原因以后，我尝试解决这个问题。只要想办法让rustc编译出不使用plt和got表的代码就行了，在翻阅了很多rust文档，我看到rustc的两个比较像的参数<code>code-model</code>和<code>relocation-model</code>（详细介绍点<a href="https://doc.rust-lang.org/rustc/codegen-options/index.html" target="_blank" rel="noopener">这里</a>），不幸的是，没有成功。</p>
+<p>我打算用更熟悉的知识体系来解决这个问题，于是我写了一段和rust的hello函数很像的c++代码。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// hello.cpp</span></span><br><span class="line"><span class="keyword">extern</span> <span class="string">"C"</span> <span class="function"><span class="keyword">int</span> <span class="title">printk</span><span class="params">(<span class="keyword">const</span> <span class="keyword">char</span> *args, ...)</span></span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">extern</span> <span class="string">"C"</span> <span class="function"><span class="keyword">void</span> <span class="title">hello</span><span class="params">(<span class="keyword">void</span>)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    printk(<span class="string">"hello world\n"</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>我把这段代码用以下命令编译打包成libhello.a，然后链接到模块代码中。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">g++ -c hello.cpp</span><br><span class="line">ar crs libhello.a hello.o</span><br></pre></td></tr></table></figure>
+
+<p>报错了，dmesg消息如下：</p>
+<blockquote>
+<p>[14837.023890] testmodule: Unknown symbol <em>GLOBAL_OFFSET_TABLE</em> (err 0)</p>
+</blockquote>
+<p>找不到GOT表的起始位置，在链接时没有这个符号。emmm，解决方法是在代码里面显式声明这个符号。如下：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// hello.cpp</span></span><br><span class="line"><span class="keyword">char</span> GLOBAL_OFFSET_TABLE;</span><br><span class="line"><span class="keyword">extern</span> <span class="string">"C"</span> <span class="function"><span class="keyword">int</span> <span class="title">printk</span><span class="params">(<span class="keyword">const</span> <span class="keyword">char</span> *args, ...)</span></span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">extern</span> <span class="string">"C"</span> <span class="function"><span class="keyword">void</span> <span class="title">hello</span><span class="params">(<span class="keyword">void</span>)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    printk(<span class="string">"hello world\n"</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>重新编译并链接。在4.15内核版本上，insmod和rmmod都成功了。在4.4版本上，依然是plt表的重定位错误。</p>
+<blockquote>
+<p>module: testmodule: Unknown rela relocation: 4</p>
+</blockquote>
+<p>唉，继续分析，到底是哪个函数在用plt重定位？</p>
+<p>执行命令<code>readelf -r testmodule.ko | grep PLT</code>，得到以下结果：</p>
+<blockquote>
+<p>000000000039  002200000004 R_X86_64_PLT32    0000000000000000 printk - 4</p>
+</blockquote>
+<p>啊，原来是printk用了PLT重定位。翻GCC文档，怎么禁止PLT（文档链接在<a href="https://gcc.gnu.org/onlinedocs/gcc/Code-Gen-Options.html" target="_blank" rel="noopener">这里</a>）。嗯，参数<code>-fno-plt</code>。试试用这个选项编译。下面是运行结果</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">root#</span> g++ -c hello.cpp -fno-plt</span><br><span class="line"><span class="meta">root#</span> readelf -r hello.o | grep PLT</span><br><span class="line"><span class="meta">root#</span> readelf -r hello.o | grep printk</span><br><span class="line">000000000012  000b00000029 R_X86_64_GOTPCREL 0000000000000000 printk - 4</span><br></pre></td></tr></table></figure>
+
+<p>没有生成用plt重定位代码，但是用的是GOT。。。链接到.ko里面，insmod果然不行。</p>
+<p>注意到了GCC文档的开头有一句话，说大部分选项都可以加上<code>no-</code>来禁止某些功能。emmm，试试禁止PIC。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">root#</span> g++ -c hello.cpp -fno-pic</span><br><span class="line"><span class="meta">root#</span> readelf -r hello.o | grep PLT</span><br><span class="line"><span class="meta">root#</span> readelf -r hello.o | grep GOT</span><br></pre></td></tr></table></figure>
+
+<p>这次没有用任何的PLT和GOT功能，链接上insmod试试。继续报错。。。</p>
+<blockquote>
+<p>[16149.495657] module: overflow in relocation type 10 val ffffffffc04e4024<br>[16149.495700] module: `testmodule’ likely not compiled with -mcmodel=kernel</p>
+</blockquote>
+<p>额，这段报错在哪里呢？翻内核源码之后，找到这段代码就在<code>apply_relocate_add</code>的尾部，距离最开始分析报错原因的位置不远。报错很明显，让加上-mmcmodel=kernel标志，为此，我又翻了下GCC文档，链接在<a href="https://gcc.gnu.org/onlinedocs/gcc/x86-Options.html" target="_blank" rel="noopener">这里</a>，总之，先试试这个选项吧。这个选项要配合上-fno-pic一起使用，否则gcc会报错。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">g++ -c hello.cpp -mcmodel=kernel -fno-pic</span><br></pre></td></tr></table></figure>
+
+<p>继续链接上看看行不行，当然，这里的module.c里面是直接调用hello，而不是printk(hello())这样的。</p>
+<p><code>insmod</code>，<code>rmmod</code>，然后<code>dmesg</code>，完美，打印出了”hello world”。</p>
+<blockquote>
+<p>[  277.693179] hello world</p>
+</blockquote>
+<h2 id="回到rust"><a href="#回到rust" class="headerlink" title="回到rust"></a>回到rust</h2><p>通过gcc的一通操作，成功让c++代码链接上了，虽然这些代码和c基本上差不多。从上面的成功案例，我们得到一个知识点，那就是得要想办法不生成pic代码，也就是不要用plt和got。</p>
+<p>rust怎么做才能得到这样的代码呢，至少用<code>code-model</code>和<code>relocation-model</code>这两个参数是不行的。要想得到解决方法，得追溯到rust代码是怎么生成的才行。于是我翻了rustc的文档，链接在<a href="https://rust-lang.github.io/rustc-guide/high-level-overview.html" target="_blank" rel="noopener">这里</a>。</p>
+<p>总体来说，rustc编译rust代码分为以下几步：</p>
+<ul>
+<li>Parsing input，这一步生成语法树AST</li>
+<li>name resolution, macro expansion, and configuration，名字解析，宏展开，处理一些#[cfg]属性</li>
+<li>Lowering to HIR，生成HIR</li>
+<li>类型检查之类的工作</li>
+<li>生成MIR，这一步会进行一些高层次的优化</li>
+<li>翻译成LLVM IR，然后进行LLVM的优化，并产生.o文件</li>
+<li>链接</li>
+</ul>
+<p>知道这些有什么用呢？我的想法是在中间进行截断，把后续工作交给gcc或者llvm，并告知它们不要进行pic处理。</p>
+<p>于是，我又翻了文档，找到一个可用的选项<code>--emit</code>，链接在<a href="https://doc.rust-lang.org/rustc/command-line-arguments.html#--emit-specifies-the-types-of-output-files-to-generate" target="_blank" rel="noopener">这里</a>。这个选项可以决定rustc编译到哪一步，比如asm, link, mir，llvm-bc，llvm-ir等等。生成.o文件肯定是不行的，因为那时已经生成了用plt/got的代码，所以，生成asm汇编代码。</p>
+<p>这次，不使用cargo来编译，而是直接上rustc。相当于c++里不用make，而是手动g++。为此，我们先修改一下rust代码：</p>
+<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// hello.rs</span></span><br><span class="line"><span class="meta">#![crate_type = <span class="meta-string">"staticlib"</span>]</span></span><br><span class="line"><span class="keyword">extern</span> <span class="string">"C"</span> &#123;</span><br><span class="line">    <span class="function"><span class="keyword">fn</span> <span class="title">printk</span></span>(s: *<span class="keyword">const</span> <span class="built_in">u8</span>, ...) -&gt; <span class="built_in">i32</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="meta">#[no_mangle]</span></span><br><span class="line"><span class="keyword">pub</span> <span class="keyword">extern</span> <span class="string">"C"</span> <span class="function"><span class="keyword">fn</span> <span class="title">hello</span></span>() &#123;</span><br><span class="line">    <span class="keyword">unsafe</span> &#123;</span><br><span class="line">        printk(<span class="string">"hello world!\n\0"</span>.as_ptr() <span class="keyword">as</span> *<span class="keyword">const</span> <span class="built_in">u8</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>接下来用rustc来编译，<code>rustc hello.rs --emit asm</code></p>
+<p>现在得到了一个hello.s，打开它，找到导致重定位错误的printk，如下，</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">callq   *printk@GOTPCREL(%rip)</span><br></pre></td></tr></table></figure>
+
+<p>手动把它改成</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">callq   printk</span><br></pre></td></tr></table></figure>
+
+<p>接下来，用gcc编译这个汇编文件。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">gcc -c hello.s -mcmodel=kernel -fno-pic</span><br></pre></td></tr></table></figure>
+
+<p>然后打包为.a后链接到模块中。然后insmod、rmmod，成功，<code>dmesg</code>的结果如下：</p>
+<blockquote>
+<p>[ 2911.089624] hello world!</p>
+</blockquote>
+<p>需要注意的是，一定要把printk的调用方式给修改了，不然编译出来的.o文件还是有PLT。</p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>要编译出能够成功链接到内核模块的代码，得使用<code>-mcmodel=kernel</code>和<code>-fno-pic</code>两个选项，而且，得保证编译出来的文件确实没有使用PLT/GOT才行。现在对于rust的做法有点原始，还得手动改生成的汇编文件。接下来的得研究一下现有的开源项目是怎么处理这个问题的。</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      
+        <a data-url="http://yoursite.com/2020/03/06/用rust写linux模块？(二)/" data-id="ck7g9ian60001d0tj5c5pnbk2" class="article-share-link" data-share="baidu" data-title="用rust写linux模块？(二)">Share</a>
+      
+
+      
+        <a href="http://yoursite.com/2020/03/06/用rust写linux模块？(二)/#ds-thread" class="article-comment-link">Comments</a>
+      
+
+      
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+  
+    <a href="/2020/03/06/用rust写linux模块？(一)/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">用rust写linux模块？(一)</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+
+  <section id="comments">
+    <div id="ds-thread" class="ds-thread" data-thread-key="2020/03/06/用rust写linux模块？(二)/" data-title="用rust写linux模块？(二)" data-url="http://yoursite.com/2020/03/06/用rust写linux模块？(二)/"></div>
+  </section>
+</section>
+      
+      <aside id="sidebar">
+  
+    
+  
+    
+  
+    
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/03/">March 2020</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/08/">August 2019</a><span class="archive-list-count">1</span></li></ul>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2020/03/06/用rust写linux模块？(二)/">用rust写linux模块？(二)</a>
+          </li>
+        
+          <li>
+            <a href="/2020/03/06/用rust写linux模块？(一)/">用rust写linux模块？(一)</a>
+          </li>
+        
+          <li>
+            <a href="/2019/08/15/访问地址流程/">在访问内存时发生了什么</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Links</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="http://arvinxiang.com" target="_blank">主题作者</a>
+          </li>
+        
+          <li>
+            <a href="http://reqianduan.com" target="_blank">热前端</a>
+          </li>
+        
+          <li>
+            <a href="http://yuancheng.work" target="_blank">远程.work</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+      
+    </div>
+    <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2020 John Doe<br>
+      Powered by <a href="//hexo.io/" target="_blank">Hexo</a>
+      .
+      Theme by <a href="https://github.com/xiangming/landscape-plus" target="_blank">Landscape-plus</a>
+    </div>
+  </div>
+</footer>
+  </div>
+  <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+  <!-- totop start -->
+<div id="totop">
+<a title="totop"><img src="/img/scrollup.png"/></a>
+</div>
+
+<!-- totop end -->
+
+<!-- 多说公共js代码 start -->
+<script type="text/javascript">
+var duoshuoQuery = {short_name:"reqianduan"};
+  (function() {
+    var ds = document.createElement('script');
+    ds.type = 'text/javascript';ds.async = true;
+    ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+    ds.charset = 'UTF-8';
+    (document.getElementsByTagName('head')[0]
+     || document.getElementsByTagName('body')[0]).appendChild(ds);
+  })();
+  </script>
+<!-- 多说公共js代码 end -->
+
+
+<!-- 百度分享 start -->
+
+<div id="article-share-box" class="article-share-box">
+  <div id="bdshare" class="bdsharebuttonbox article-share-links">
+    <a class="article-share-weibo" data-cmd="tsina" title="分享到新浪微博"></a>
+    <a class="article-share-weixin" data-cmd="weixin" title="分享到微信"></a>
+    <a class="article-share-qq" data-cmd="sqq" title="分享到QQ"></a>
+    <a class="article-share-renren" data-cmd="renren" title="分享到人人网"></a>
+    <a class="article-share-more" data-cmd="more" title="更多"></a>
+  </div>
+</div>
+<script>
+  function SetShareData(cmd, config) {
+    if (shareDataTitle && shareDataUrl) {
+      config.bdText = shareDataTitle;
+      config.bdUrl = shareDataUrl;
+    }
+    return config;
+  }
+  window._bd_share_config={
+    "common":{onBeforeClick: SetShareData},
+    "share":{"bdCustomStyle":"/css/bdshare.css"}
+  };
+  with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='//bdimg.share.baidu.com/static/api/js/share.js?cdnversion='+~(-new Date()/36e5)];
+</script>
+
+<!-- 百度分享 end -->
+
+<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+
+
+
+
+<script src="/js/script.js"></script>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,337 @@
+
+<!DOCTYPE html>
+<html>
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="utf-8">
+  
+  <title>用rust写linux模块？(一) | mq&#39;s website</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="用rust写linux模块？(一)​    最近研究了下rust，感觉要是能够用来写linux module，开发体验应该会好很多。这篇文章记录我尝试用rust开发linux模块踩坑的全过程（可能会弃坑）。如果同样有人想要用rust开发linux模块，我的文章应该没有什么帮助，建议直接使用github上已有的一些开源项目，点这里和这里。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="用rust写linux模块？(一)">
+<meta property="og:url" content="http://yoursite.com/2020/03/06/用rust写linux模块？(一)/index.html">
+<meta property="og:site_name" content="mq&#39;s website">
+<meta property="og:description" content="用rust写linux模块？(一)​    最近研究了下rust，感觉要是能够用来写linux module，开发体验应该会好很多。这篇文章记录我尝试用rust开发linux模块踩坑的全过程（可能会弃坑）。如果同样有人想要用rust开发linux模块，我的文章应该没有什么帮助，建议直接使用github上已有的一些开源项目，点这里和这里。">
+<meta property="og:locale" content="en">
+<meta property="og:updated_time" content="2020-03-06T14:28:20.908Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="用rust写linux模块？(一)">
+<meta name="twitter:description" content="用rust写linux模块？(一)​    最近研究了下rust，感觉要是能够用来写linux module，开发体验应该会好很多。这篇文章记录我尝试用rust开发linux模块踩坑的全过程（可能会弃坑）。如果同样有人想要用rust开发linux模块，我的文章应该没有什么帮助，建议直接使用github上已有的一些开源项目，点这里和这里。">
+  
+    <link rel="alternative" href="/atom.xml" title="mq&#39;s website" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  <link rel="stylesheet" href="/css/style.css">
+  <!--[if lt IE 9]><script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7/html5shiv.min.js"></script><![endif]-->
+  
+</head></html>
+<body>
+<div id="container">
+  <div id="wrap">
+    <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">mq&#39;s website</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//www.baidu.com/baidu" method="get" accept-charset="utf-8" class="search-form">
+          <input type="search" name="word" maxlength="20" class="search-form-input" placeholder="Search">
+          <input type="submit" value="" class="search-form-submit">
+          <input name=tn type=hidden value="bds">
+          <input name=cl type=hidden value="3">
+          <input name=ct type=hidden value="2097152">
+          <input type="hidden" name="si" value="yoursite.com">
+        </form>
+      </div>
+    </div>
+  </div>
+</header>
+    <div class="outer">
+      <section id="main"><article id="post-用rust写linux模块？(一)" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2020/03/06/用rust写linux模块？(一)/" class="article-date">
+  <time datetime="2020-03-06T11:30:00.000Z" itemprop="datePublished">2020-03-06</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      用rust写linux模块？(一)
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h1 id="用rust写linux模块？-一"><a href="#用rust写linux模块？-一" class="headerlink" title="用rust写linux模块？(一)"></a>用rust写linux模块？(一)</h1><p>​    最近研究了下rust，感觉要是能够用来写linux module，开发体验应该会好很多。这篇文章记录我尝试用rust开发linux模块踩坑的全过程（可能会弃坑）。如果同样有人想要用rust开发linux模块，我的文章应该没有什么帮助，建议直接使用github上已有的一些开源项目，点<a href="https://github.com/fishinabarrel/linux-kernel-module-rust" target="_blank" rel="noopener">这里</a>和<a href="https://github.com/tsgates/rust.ko" target="_blank" rel="noopener">这里</a>。</p>
+<a id="more"></a>
+<h2 id="思路"><a href="#思路" class="headerlink" title="思路"></a>思路</h2><p>以下是目前已知的一些知识点：</p>
+<ol>
+<li>linux模块文件，也就是.ko文件，其实是一个特殊的由内核加载的重定位文件。所以，不论是什么语言，只要能够通过编译器生成这个.ko文件就可以了。</li>
+<li>在编译linux模块文件时，可以指定链接一些.a文件</li>
+<li>rust与c语言进行交互，有两种方法，一种是c语言调rust回调，另一种是rust以FFI的方式调c函数。具体的方式点<a href="https://doc.rust-lang.org/nomicon/ffi.html" target="_blank" rel="noopener">这里</a></li>
+</ol>
+<p>综上，我的思路是用rust写一些核心的功能，然后编译为静态库.a文件，然后在编译linux模块时链接这个.a文件。</p>
+<p>这么做的一个好处是比较好操控这些中间文件，毕竟我用c比用rust更熟；另一个是如果这样做确实可行，那么我可以写一些跑在用户态的中间库，让rust的代码链接到这些中间库，而不是内核的函数中，这样可以在用户态做一些核心功能的调试，减少重启系统的次数。</p>
+<h2 id="最简单的hello-world尝试"><a href="#最简单的hello-world尝试" class="headerlink" title="最简单的hello world尝试"></a>最简单的hello world尝试</h2><p>我们让rust提供一个叫<code>hello</code>的函数，这个函数返回字符串”<code>hello world&quot;</code>，然后用c语言来调用这个函数打印出字符串。</p>
+<p>先来处理rust部分，首先<code>cargo new --lib hello</code>生成一个rust工程，然后修改lib.rs和Cargo.toml，代码分别如下。接下来<code>cargo build</code>生成libhello.a.</p>
+<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#[no_mangle]</span></span><br><span class="line"><span class="keyword">pub</span> <span class="keyword">extern</span> <span class="string">"C"</span> <span class="function"><span class="keyword">fn</span> <span class="title">hello</span></span>()-&gt;*<span class="keyword">const</span> <span class="built_in">u8</span>&#123;</span><br><span class="line">    <span class="string">"hello world\n\0"</span>.as_ptr() <span class="keyword">as</span> *<span class="keyword">const</span> <span class="built_in">u8</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight toml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="section">[package]</span></span><br><span class="line"><span class="attr">name</span> = <span class="string">"hello"</span></span><br><span class="line"><span class="attr">version</span> = <span class="string">"0.1.0"</span></span><br><span class="line"><span class="attr">authors</span> = [<span class="string">"root"</span>]</span><br><span class="line"><span class="attr">edition</span> = <span class="string">"2018"</span></span><br><span class="line"></span><br><span class="line"><span class="section">[dependencies]</span></span><br><span class="line"></span><br><span class="line"><span class="section">[lib]</span></span><br><span class="line"><span class="attr">crate-type</span> = [<span class="string">"staticlib"</span>]</span><br></pre></td></tr></table></figure>
+
+<p>接下来处理c语言的部分，包括Kbuild，Makefile和module.c三个文件，整个项目的结构如下：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">.</span><br><span class="line">├── hello</span><br><span class="line">│   ├── Cargo.lock</span><br><span class="line">│   ├── Cargo.toml</span><br><span class="line">│   └── src</span><br><span class="line">│       └── lib.rs</span><br><span class="line">├── Kbuild</span><br><span class="line">├── Makefile</span><br><span class="line">└── module.c</span><br></pre></td></tr></table></figure>
+
+<p>Kuild、Makefile和module.c三个文件的内容如下：</p>
+<figure class="highlight makefile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">MODULE_NAME=testmodule</span><br><span class="line">OBJS := module.o</span><br><span class="line">LIBS := hello/target/debug/libhello.a</span><br><span class="line"></span><br><span class="line">ccflags-y := -Wall -g -DDEBUG</span><br><span class="line">clean-files := $&#123;OBJS&#125;</span><br><span class="line"></span><br><span class="line">obj-m = <span class="variable">$(MODULE_NAME)</span>.o</span><br><span class="line"><span class="variable">$(MODULE_NAME)</span>-y = <span class="variable">$(OBJS)</span> <span class="variable">$(LIBS)</span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight makefile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">KDIR = /lib/modules/`uname -r`/build</span><br><span class="line"></span><br><span class="line"><span class="section">kbuild:</span></span><br><span class="line">	make -C <span class="variable">$(KDIR)</span> M=`pwd`</span><br><span class="line"></span><br><span class="line"><span class="section">clean:</span></span><br><span class="line">	make -C <span class="variable">$(KDIR)</span> M=`pwd` clean</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;linux/module.h&gt;</span></span></span><br><span class="line"></span><br><span class="line">MODULE_DESCRIPTION(<span class="string">"this is a test module"</span>);</span><br><span class="line">MODULE_LICENSE(<span class="string">"GPL"</span>);</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">extern</span> <span class="keyword">const</span> <span class="keyword">char</span> * <span class="title">hello</span><span class="params">(<span class="keyword">void</span>)</span></span>;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">driver_initialize</span><span class="params">(<span class="keyword">void</span>)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">driver_uninitialize</span><span class="params">(<span class="keyword">void</span>)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    printk(hello());</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">module_init(driver_initialize);</span><br><span class="line">module_exit(driver_uninitialize);</span><br></pre></td></tr></table></figure>
+
+<p>编译后，<code>insmod</code>和<code>rmmod</code>都没有遇到问题，用<code>dmesg | tail</code>后看到最后一行有如下结果：</p>
+<blockquote>
+<p>[ 6872.348098] hello world</p>
+</blockquote>
+<p>看似还行。</p>
+<h2 id="存在的问题"><a href="#存在的问题" class="headerlink" title="存在的问题"></a>存在的问题</h2><h3 id="问题一"><a href="#问题一" class="headerlink" title="问题一"></a>问题一</h3><p>以上流程我是在ubuntu18.04，内核版本4.15.0-38-generic上跑的，没有遇到问题，但当我将同样的代码放到ubuntu18.04，内核版本4.4.0-87-generic的系统上跑时，就出现问题了。</p>
+<p>在insmod时，程序报错如下：</p>
+<blockquote>
+<p>insmod: ERROR: could not insert module testmodule.ko: Invalid module format</p>
+</blockquote>
+<p>dmesg看到的信息如下：</p>
+<blockquote>
+<p>[ 9839.177419] module: testmodule: Unknown rela relocation: 4</p>
+</blockquote>
+<h3 id="问题二"><a href="#问题二" class="headerlink" title="问题二"></a>问题二</h3><p>我们想让hello直接调用printk进行打印，而不是返回字符串，所以修改一下代码，lib.rs的代码如下：</p>
+<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">extern</span> <span class="string">"C"</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="function"><span class="keyword">fn</span> <span class="title">printk</span></span>(s : *<span class="keyword">const</span> <span class="built_in">u8</span>, ...)-&gt;<span class="built_in">i32</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="meta">#[no_mangle]</span></span><br><span class="line"><span class="keyword">pub</span> <span class="keyword">extern</span> <span class="string">"C"</span> <span class="function"><span class="keyword">fn</span> <span class="title">hello</span></span>()&#123;</span><br><span class="line">    <span class="keyword">unsafe</span>&#123;</span><br><span class="line">        printk(<span class="string">"hello world\n\0"</span>.as_ptr() <span class="keyword">as</span> *<span class="keyword">const</span> <span class="built_in">u8</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在module.c里面也要进行相应的修改：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">...</span><br><span class="line"><span class="function"><span class="keyword">extern</span> <span class="keyword">void</span> <span class="title">hello</span><span class="params">(<span class="keyword">void</span>)</span></span>;</span><br><span class="line">...</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">driver_uninitialize</span><span class="params">(<span class="keyword">void</span>)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    hello();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>make之后，insmod报错：</p>
+<blockquote>
+<p>insmod: ERROR: could not insert module testmodule.ko: Invalid module format</p>
+</blockquote>
+<p>dmesg信息如下：</p>
+<blockquote>
+<p>[11061.846413] module: testmodule: Unknown rela relocation: 9</p>
+</blockquote>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>显然，都是重定位出错了，内核在加载module的时候，不识别一些重定位方式。我在写这篇文章时，才刚让直接调用printk的hello跑起来，这里面的坑还挺大的，得单开一篇文章来讲讲这个事情，所以，后续解决方法见本系列第二篇。</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      
+        <a data-url="http://yoursite.com/2020/03/06/用rust写linux模块？(一)/" data-id="ck7g9iamp0000d0tjg0f37t2l" class="article-share-link" data-share="baidu" data-title="用rust写linux模块？(一)">Share</a>
+      
+
+      
+        <a href="http://yoursite.com/2020/03/06/用rust写linux模块？(一)/#ds-thread" class="article-comment-link">Comments</a>
+      
+
+      
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2020/03/06/用rust写linux模块？(二)/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          用rust写linux模块？(二)
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2019/08/15/访问地址流程/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">在访问内存时发生了什么</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+
+  <section id="comments">
+    <div id="ds-thread" class="ds-thread" data-thread-key="2020/03/06/用rust写linux模块？(一)/" data-title="用rust写linux模块？(一)" data-url="http://yoursite.com/2020/03/06/用rust写linux模块？(一)/"></div>
+  </section>
+</section>
+      
+      <aside id="sidebar">
+  
+    
+  
+    
+  
+    
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/03/">March 2020</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/08/">August 2019</a><span class="archive-list-count">1</span></li></ul>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2020/03/06/用rust写linux模块？(二)/">用rust写linux模块？(二)</a>
+          </li>
+        
+          <li>
+            <a href="/2020/03/06/用rust写linux模块？(一)/">用rust写linux模块？(一)</a>
+          </li>
+        
+          <li>
+            <a href="/2019/08/15/访问地址流程/">在访问内存时发生了什么</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Links</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="http://arvinxiang.com" target="_blank">主题作者</a>
+          </li>
+        
+          <li>
+            <a href="http://reqianduan.com" target="_blank">热前端</a>
+          </li>
+        
+          <li>
+            <a href="http://yuancheng.work" target="_blank">远程.work</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+      
+    </div>
+    <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2020 John Doe<br>
+      Powered by <a href="//hexo.io/" target="_blank">Hexo</a>
+      .
+      Theme by <a href="https://github.com/xiangming/landscape-plus" target="_blank">Landscape-plus</a>
+    </div>
+  </div>
+</footer>
+  </div>
+  <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+  <!-- totop start -->
+<div id="totop">
+<a title="totop"><img src="/img/scrollup.png"/></a>
+</div>
+
+<!-- totop end -->
+
+<!-- 多说公共js代码 start -->
+<script type="text/javascript">
+var duoshuoQuery = {short_name:"reqianduan"};
+  (function() {
+    var ds = document.createElement('script');
+    ds.type = 'text/javascript';ds.async = true;
+    ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+    ds.charset = 'UTF-8';
+    (document.getElementsByTagName('head')[0]
+     || document.getElementsByTagName('body')[0]).appendChild(ds);
+  })();
+  </script>
+<!-- 多说公共js代码 end -->
+
+
+<!-- 百度分享 start -->
+
+<div id="article-share-box" class="article-share-box">
+  <div id="bdshare" class="bdsharebuttonbox article-share-links">
+    <a class="article-share-weibo" data-cmd="tsina" title="分享到新浪微博"></a>
+    <a class="article-share-weixin" data-cmd="weixin" title="分享到微信"></a>
+    <a class="article-share-qq" data-cmd="sqq" title="分享到QQ"></a>
+    <a class="article-share-renren" data-cmd="renren" title="分享到人人网"></a>
+    <a class="article-share-more" data-cmd="more" title="更多"></a>
+  </div>
+</div>
+<script>
+  function SetShareData(cmd, config) {
+    if (shareDataTitle && shareDataUrl) {
+      config.bdText = shareDataTitle;
+      config.bdUrl = shareDataUrl;
+    }
+    return config;
+  }
+  window._bd_share_config={
+    "common":{onBeforeClick: SetShareData},
+    "share":{"bdCustomStyle":"/css/bdshare.css"}
+  };
+  with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='//bdimg.share.baidu.com/static/api/js/share.js?cdnversion='+~(-new Date()/36e5)];
+</script>
+
+<!-- 百度分享 end -->
+
+<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+
+
+
+
+<script src="/js/script.js"></script>
+
+</div>
+</body>
+</html>

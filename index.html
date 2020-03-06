@@ -1,0 +1,381 @@
+
+<!DOCTYPE html>
+<html>
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="utf-8">
+  
+  <title>mq&#39;s website</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta property="og:type" content="website">
+<meta property="og:title" content="mq&#39;s website">
+<meta property="og:url" content="http://yoursite.com/index.html">
+<meta property="og:site_name" content="mq&#39;s website">
+<meta property="og:locale" content="en">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="mq&#39;s website">
+  
+    <link rel="alternative" href="/atom.xml" title="mq&#39;s website" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  <link rel="stylesheet" href="/css/style.css">
+  <!--[if lt IE 9]><script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7/html5shiv.min.js"></script><![endif]-->
+  
+</head></html>
+<body>
+<div id="container">
+  <div id="wrap">
+    <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">mq&#39;s website</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//www.baidu.com/baidu" method="get" accept-charset="utf-8" class="search-form">
+          <input type="search" name="word" maxlength="20" class="search-form-input" placeholder="Search">
+          <input type="submit" value="" class="search-form-submit">
+          <input name=tn type=hidden value="bds">
+          <input name=cl type=hidden value="3">
+          <input name=ct type=hidden value="2097152">
+          <input type="hidden" name="si" value="yoursite.com">
+        </form>
+      </div>
+    </div>
+  </div>
+</header>
+    <div class="outer">
+      <section id="main">
+  
+    <article id="post-用rust写linux模块？(二)" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2020/03/06/用rust写linux模块？(二)/" class="article-date">
+  <time datetime="2020-03-06T13:00:00.000Z" itemprop="datePublished">2020-03-06</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2020/03/06/用rust写linux模块？(二)/">用rust写linux模块？(二)</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h1 id="用rust写linux模块？-二"><a href="#用rust写linux模块？-二" class="headerlink" title="用rust写linux模块？ (二)"></a>用rust写linux模块？ (二)</h1><p>上一篇结尾讲到，重定位报错了。先重复一下上一篇提到的错误：</p>
+<p>在换了个内核版本后得到的错误如下：</p>
+<blockquote>
+<p>[ 9839.177419] module: testmodule: Unknown rela relocation: 4</p>
+</blockquote>
+<p>在尝试直接调用printk时得到的错误如下：</p>
+<blockquote>
+<p>[11061.846413] module: testmodule: Unknown rela relocation: 9</p>
+</blockquote>
+        
+          <p class="article-more-link">
+            <a href="/2020/03/06/用rust写linux模块？(二)/#more">Read More</a>
+          </p>
+        
+      
+    </div>
+    <footer class="article-footer">
+      
+        <a data-url="http://yoursite.com/2020/03/06/用rust写linux模块？(二)/" data-id="ck7g9ian60001d0tj5c5pnbk2" class="article-share-link" data-share="baidu" data-title="用rust写linux模块？(二)">Share</a>
+      
+
+      
+        <a href="http://yoursite.com/2020/03/06/用rust写linux模块？(二)/#ds-thread" class="article-comment-link">Comments</a>
+      
+
+      
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-用rust写linux模块？(一)" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2020/03/06/用rust写linux模块？(一)/" class="article-date">
+  <time datetime="2020-03-06T11:30:00.000Z" itemprop="datePublished">2020-03-06</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2020/03/06/用rust写linux模块？(一)/">用rust写linux模块？(一)</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h1 id="用rust写linux模块？-一"><a href="#用rust写linux模块？-一" class="headerlink" title="用rust写linux模块？(一)"></a>用rust写linux模块？(一)</h1><p>​    最近研究了下rust，感觉要是能够用来写linux module，开发体验应该会好很多。这篇文章记录我尝试用rust开发linux模块踩坑的全过程（可能会弃坑）。如果同样有人想要用rust开发linux模块，我的文章应该没有什么帮助，建议直接使用github上已有的一些开源项目，点<a href="https://github.com/fishinabarrel/linux-kernel-module-rust" target="_blank" rel="noopener">这里</a>和<a href="https://github.com/tsgates/rust.ko" target="_blank" rel="noopener">这里</a>。</p>
+        
+          <p class="article-more-link">
+            <a href="/2020/03/06/用rust写linux模块？(一)/#more">Read More</a>
+          </p>
+        
+      
+    </div>
+    <footer class="article-footer">
+      
+        <a data-url="http://yoursite.com/2020/03/06/用rust写linux模块？(一)/" data-id="ck7g9iamp0000d0tjg0f37t2l" class="article-share-link" data-share="baidu" data-title="用rust写linux模块？(一)">Share</a>
+      
+
+      
+        <a href="http://yoursite.com/2020/03/06/用rust写linux模块？(一)/#ds-thread" class="article-comment-link">Comments</a>
+      
+
+      
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-访问地址流程" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2019/08/15/访问地址流程/" class="article-date">
+  <time datetime="2019-08-15T07:18:46.000Z" itemprop="datePublished">2019-08-15</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2019/08/15/访问地址流程/">在访问内存时发生了什么</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>假如有以下代码</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">int</span> * pa;</span><br><span class="line">...<span class="comment">//对pa进行初始化</span></span><br><span class="line"><span class="keyword">int</span> a = *pa;</span><br></pre></td></tr></table></figure>
+
+<p>很明显这行代码是在访问某个内存区域，那么，在访问该内存区域时会经历哪些步骤呢？</p>
+<p>以linux系统和x86cpu为例，让我们来探究一下访问内存区域的全过程。</p>
+<p>简单来说，分为以下几步：</p>
+<ul>
+<li>首先，需要进行地址转换，因为现代cpu大部分时候运行在保护模式下。<ul>
+<li>首先是分段机制，通过段表来将逻辑地址转换为线性地址</li>
+<li>然后是分页机制，通过页表将线性地址转换为物理地址</li>
+<li>在转换的过程中，还会涉及到TLB</li>
+</ul>
+</li>
+<li>现在，cpu得到了物理地址，通过该物理地址进行访问，这会涉及到cache</li>
+<li>在上面的过程中，还会遇到非法地址访问或者page fault的问题，这需要交给内核进行处理。</li>
+</ul>
+<p>接下来，从上面描述到的各个步骤来深挖一下里面涉及到的东西。不过，说是深挖，但是涉及到的东西太多了，也只能浅尝辄止。</p>
+        
+          <p class="article-more-link">
+            <a href="/2019/08/15/访问地址流程/#more">Read More</a>
+          </p>
+        
+      
+    </div>
+    <footer class="article-footer">
+      
+        <a data-url="http://yoursite.com/2019/08/15/访问地址流程/" data-id="ck7fyc9bq0000x4tjtf30ia1d" class="article-share-link" data-share="baidu" data-title="在访问内存时发生了什么">Share</a>
+      
+
+      
+        <a href="http://yoursite.com/2019/08/15/访问地址流程/#ds-thread" class="article-comment-link">Comments</a>
+      
+
+      
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+
+</section>
+      
+      <aside id="sidebar">
+  
+    
+  
+    
+  
+    
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/03/">March 2020</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/08/">August 2019</a><span class="archive-list-count">1</span></li></ul>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2020/03/06/用rust写linux模块？(二)/">用rust写linux模块？(二)</a>
+          </li>
+        
+          <li>
+            <a href="/2020/03/06/用rust写linux模块？(一)/">用rust写linux模块？(一)</a>
+          </li>
+        
+          <li>
+            <a href="/2019/08/15/访问地址流程/">在访问内存时发生了什么</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Links</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="http://arvinxiang.com" target="_blank">主题作者</a>
+          </li>
+        
+          <li>
+            <a href="http://reqianduan.com" target="_blank">热前端</a>
+          </li>
+        
+          <li>
+            <a href="http://yuancheng.work" target="_blank">远程.work</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+      
+    </div>
+    <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2020 John Doe<br>
+      Powered by <a href="//hexo.io/" target="_blank">Hexo</a>
+      .
+      Theme by <a href="https://github.com/xiangming/landscape-plus" target="_blank">Landscape-plus</a>
+    </div>
+  </div>
+</footer>
+  </div>
+  <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+  <!-- totop start -->
+<div id="totop">
+<a title="totop"><img src="/img/scrollup.png"/></a>
+</div>
+
+<!-- totop end -->
+
+<!-- 多说公共js代码 start -->
+<script type="text/javascript">
+var duoshuoQuery = {short_name:"reqianduan"};
+  (function() {
+    var ds = document.createElement('script');
+    ds.type = 'text/javascript';ds.async = true;
+    ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+    ds.charset = 'UTF-8';
+    (document.getElementsByTagName('head')[0]
+     || document.getElementsByTagName('body')[0]).appendChild(ds);
+  })();
+  </script>
+<!-- 多说公共js代码 end -->
+
+
+<!-- 百度分享 start -->
+
+<div id="article-share-box" class="article-share-box">
+  <div id="bdshare" class="bdsharebuttonbox article-share-links">
+    <a class="article-share-weibo" data-cmd="tsina" title="分享到新浪微博"></a>
+    <a class="article-share-weixin" data-cmd="weixin" title="分享到微信"></a>
+    <a class="article-share-qq" data-cmd="sqq" title="分享到QQ"></a>
+    <a class="article-share-renren" data-cmd="renren" title="分享到人人网"></a>
+    <a class="article-share-more" data-cmd="more" title="更多"></a>
+  </div>
+</div>
+<script>
+  function SetShareData(cmd, config) {
+    if (shareDataTitle && shareDataUrl) {
+      config.bdText = shareDataTitle;
+      config.bdUrl = shareDataUrl;
+    }
+    return config;
+  }
+  window._bd_share_config={
+    "common":{onBeforeClick: SetShareData},
+    "share":{"bdCustomStyle":"/css/bdshare.css"}
+  };
+  with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='//bdimg.share.baidu.com/static/api/js/share.js?cdnversion='+~(-new Date()/36e5)];
+</script>
+
+<!-- 百度分享 end -->
+
+<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+
+
+
+
+<script src="/js/script.js"></script>
+
+</div>
+</body>
+</html>
