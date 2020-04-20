@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <script src="https://cdn.bootcss.com/jquery/3.1.0/jquery.min.js"></script>
+  
+<link rel="stylesheet" href="/css/layout.css">
+
+  <title>
+     
+      BST
+     
+  </title>
+<meta name="generator" content="Hexo 4.2.0"></head>
+
+<body>
+  <div id='post'>
+    
+<link rel="stylesheet" href="/css/post.css">
+
+    
+<link rel="stylesheet" href="/css/header.css">
+
+    
+<link rel="stylesheet" href="/css/footer.css">
+
+    
+<link rel="stylesheet" href="/css/article.css">
+
+    
+<script src="/js/article.js"></script>
+
+    
+<script src="/js/post.js"></script>
+
+    
+<script src="/js/header.js"></script>
+
+    
+<script src="/js/footer.js"></script>
+
+
+    <div id="header">
+    
+<script src="/js/header.js"></script>
+
+    
+<link rel="stylesheet" href="/css/header.css">
+
+    <div id="sidebar">
+        <ul>
+            <a href="/">主页</a>
+            <a href="#archive">归档</a>
+        </ul>
+    </div>
+    <div id="mask"></div>
+    <span id="btn-sidebar">&#9776;</span>
+</div>
+    <span id='btn-content'>&#8678;</span>
+    <div id="post-content"></div>
+    <div id="post-grid">
+        <div></div>
+        <div id="post-text">
+            <h1 class='tittle'>
+                
+                BST
+                
+            </h1>
+            <div class="article-text">
+    <h2 id="BST"><a href="#BST" class="headerlink" title="BST"></a>BST</h2><p>BST，二叉搜索树，binary  search tree。定义如下：</p>
+<ul>
+<li>左子树所有节点的值小于当前节点的值</li>
+<li>右子树所有节点的值大于当前节点的值</li>
+<li>左子树和右子树也是BST。<a id="more"></a>
+<h3 id="判定"><a href="#判定" class="headerlink" title="判定"></a>判定</h3></li>
+</ul>
+<p>BST的一个比较重要的性质是：中序遍历得到的数列是递增的。</p>
+<p>这一点正好可以用于判定一棵二叉树是否是BST。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">static</span> <span class="keyword">bool</span> <span class="title">Impl</span><span class="params">(TreeNode* root, <span class="keyword">int</span> &amp; last, <span class="keyword">bool</span> &amp; lastValid)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">if</span>(root-&gt;left &amp;&amp; !Impl(root-&gt;left, last, lastValid))</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">    <span class="keyword">if</span>(lastValid &amp;&amp; last &gt;= root-&gt;val)</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">    last = root-&gt;val;</span><br><span class="line">    lastValid = <span class="literal">true</span>;</span><br><span class="line">    <span class="keyword">if</span>(root-&gt;right &amp;&amp; !Impl(root-&gt;right, last, lastValid))</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">    <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">bool</span> <span class="title">isValidBST</span><span class="params">(TreeNode* root)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span>(!root)</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">    <span class="keyword">int</span> last;</span><br><span class="line">    <span class="keyword">bool</span> lastValid = <span class="literal">false</span>;</span><br><span class="line">    <span class="keyword">return</span> Impl(root, last, lastValid);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="删除节点"><a href="#删除节点" class="headerlink" title="删除节点"></a>删除节点</h3><p>BST的查找节点太简单了，这里略过。比较值得注意的是BST的删除节点操作，这一思路也被沿用到了AVL中。删除操作比较特殊，是因为在删除节点后，还得要维持BST的性质。</p>
+<p>BST的删除主要分为以下几种情况：</p>
+<p>一，如果被删除节点是叶子节点，那么直接删除。<br><img src="/img/BST/remove1.png" alt=""><br>二，如果被删除节点只有左儿子或者右儿子节点，那么直接删除该节点，并把它的父亲与它的左/右儿子连在一起。<br><img src="/img/BST/remove2.png" alt=""><br>三，如果被删除节点左右儿子都有，那么选择它右儿子中最小的那个节点作为替死鬼，把这个替死鬼的值赋给当前节点，并把替死鬼节点删掉。当然，选择左儿子中最大的那个节点也是可行的。<br><img src="/img/BST/remove3.png" alt=""></p>
+ 
+</div>
+        </div>
+        <div></div>
+    </div>
+    <div id="footer">
+    <span id="btn-to-top">&#8679;</span>
+    <div id="theme-info">
+        <span>theme:<a href="https://github.com/12-th/ezread" target="_blank" rel="noopener">ezread</a></span>
+    </div>
+</div> 
+</div>
+</body>
+
+</html>

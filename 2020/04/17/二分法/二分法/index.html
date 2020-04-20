@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <script src="https://cdn.bootcss.com/jquery/3.1.0/jquery.min.js"></script>
+  
+<link rel="stylesheet" href="/css/layout.css">
+
+  <title>
+     
+      二分查找
+     
+  </title>
+<meta name="generator" content="Hexo 4.2.0"></head>
+
+<body>
+  <div id='post'>
+    
+<link rel="stylesheet" href="/css/post.css">
+
+    
+<link rel="stylesheet" href="/css/header.css">
+
+    
+<link rel="stylesheet" href="/css/footer.css">
+
+    
+<link rel="stylesheet" href="/css/article.css">
+
+    
+<script src="/js/article.js"></script>
+
+    
+<script src="/js/post.js"></script>
+
+    
+<script src="/js/header.js"></script>
+
+    
+<script src="/js/footer.js"></script>
+
+
+    <div id="header">
+    
+<script src="/js/header.js"></script>
+
+    
+<link rel="stylesheet" href="/css/header.css">
+
+    <div id="sidebar">
+        <ul>
+            <a href="/">主页</a>
+            <a href="#archive">归档</a>
+        </ul>
+    </div>
+    <div id="mask"></div>
+    <span id="btn-sidebar">&#9776;</span>
+</div>
+    <span id='btn-content'>&#8678;</span>
+    <div id="post-content"></div>
+    <div id="post-grid">
+        <div></div>
+        <div id="post-text">
+            <h1 class='tittle'>
+                
+                二分查找
+                
+            </h1>
+            <div class="article-text">
+    <p>二分法其实挺难的，第一个二分查找程序在1946年就公布了，但是第一个没有bug的二分查找程序在1962年才出现。在刷leetcode的时候，很多题加深了我对二分法的认识，这里简要记录一下二分法中相应细节。</p>
+<a id="more"></a>
+<h2 id="二分查找-leetcode704"><a href="#二分查找-leetcode704" class="headerlink" title="二分查找/leetcode704"></a>二分查找/leetcode704</h2><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">search</span><span class="params">(<span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt;&amp; nums, <span class="keyword">int</span> target)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">int</span> l = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">int</span> h = nums.<span class="built_in">size</span>()<span class="number">-1</span>;</span><br><span class="line">    <span class="keyword">while</span>(l&lt;=h)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">int</span> m = (l+h)/<span class="number">2</span>;</span><br><span class="line">        <span class="keyword">if</span>(nums[m]==target)</span><br><span class="line">            <span class="keyword">return</span> m;</span><br><span class="line">        <span class="keyword">if</span>(nums[m]&lt;target)</span><br><span class="line">            l=m+<span class="number">1</span>;</span><br><span class="line">        <span class="keyword">else</span></span><br><span class="line">            h=m<span class="number">-1</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这个是二分查找特定值的代码，如果数组中存在target，则返回该target的索引，否则返回-1。</p>
+<p>虽然对二分法的代码已经很熟悉了，但是这里还是要先解释一下一些代码的作用。</p>
+<ul>
+<li><p><code>h = nums.size()-1</code>。这使得我们的查找区间位于闭区间<code>[l, h]</code>中。如果使用左闭右开区间[<code>l,h)</code>，那么后续的一些操作会麻烦一些。</p>
+</li>
+<li><p><code>while(l&lt;=h)</code>。为什么使用<code>l&lt;=h</code>，而不是<code>l&lt;h</code>呢。如果使用<code>l&lt;h</code>，那么在最后一轮比较中区间会有两个值。这样会漏掉一些情况，比如对于数组<code>[2,5]</code>，算法就无法正常运行。如果强行要使用<code>l&lt;h</code>，也不是不可以，但代码需要改成这样：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">search</span><span class="params">(<span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt;&amp; nums, <span class="keyword">int</span> target)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">int</span> l = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">int</span> h = nums.<span class="built_in">size</span>()<span class="number">-1</span>;</span><br><span class="line">    <span class="keyword">while</span>(l&lt;h)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">int</span> m = (l+h)/<span class="number">2</span>;</span><br><span class="line">        <span class="keyword">if</span>(nums[m]==target)</span><br><span class="line">            <span class="keyword">return</span> m;</span><br><span class="line">        <span class="keyword">if</span>(nums[m]&lt;target)</span><br><span class="line">            l=m+<span class="number">1</span>;</span><br><span class="line">        <span class="keyword">else</span></span><br><span class="line">            h=m<span class="number">-1</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> nums[l]==target?l:<span class="number">-1</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>总之，这里要记住，如果我们只是想要搜索到一个值，那么结束条件应该是<code>l&lt;=h</code>，因为这样的区间最后一轮才只有一个元素。如果最后一轮需要两个元素，才使用<code>l&lt;h</code>，比如leetcode153.</p>
+</li>
+<li><p><code>m = (l+h)/2;</code>。<span style="color:red">这个写法是有问题的，</span>正确的写法应该是<code>m=l+(h-l)/2</code>，原因是<code>l+h</code>可能溢出。</p>
+</li>
+<li><p><code>m = (l+h)/2;</code>。另一个要说的问题，是m是向l靠近的。比如说<code>l=2,h=3</code>，那么<code>m=2</code>。这带来的结果是，l和m在区间元素个数小于等于2时重合，而h仅在区间元素个数为1时与m重合。这进而导致很多时候二分法结束后，l就是我们想要的结果。（比如lower_bound和uppper_bound，再比如上面强行使用<code>l&lt;h</code>的代码中，最后返回的是l）。</p>
+</li>
+<li><p><code>l=m+1</code>和<code>h=m-1</code>，当<code>nums[m]!=target</code>时，m这个位置的元素是可以被排除掉的，所以在调整l和m时，并没有写作<code>l=m</code>或者<code>h=m</code>。注意，调整l和m是很有讲究的，一定要思考清楚，而不是无脑<code>+1</code>、<code>-1</code>。这点在leetcode153中就有体现。另外，如果不精准地对l和h<code>+1</code>、<code>-1</code>，很可能会导致死循环。</p>
+</li>
+</ul>
+<h2 id="lower-bound和upper-bound-leetcode34"><a href="#lower-bound和upper-bound-leetcode34" class="headerlink" title="lower_bound和upper_bound/leetcode34"></a>lower_bound和upper_bound/leetcode34</h2><h3 id="lower-bound"><a href="#lower-bound" class="headerlink" title="lower_bound"></a>lower_bound</h3><p>stl中，lower_bound的结果是返回第一个大于等于target的元素的位置。</p>
+<p>下面的代码是以l为基准的lower_bound实现，m的计算结果是向l靠近的。它和stl的lower_bound一样，返回第一个大于等于target的元素的位置，结果的值域为[0,N]。当数组中所有的元素都小于target时，它返回N。其中N是数组的元素个数。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">lowerbound</span><span class="params">(<span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt; &amp; nums, <span class="keyword">int</span> target)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">int</span> l = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">int</span> h = nums.<span class="built_in">size</span>()<span class="number">-1</span>;</span><br><span class="line">    <span class="keyword">while</span>(l&lt;=h)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">int</span> m=(l+h)/<span class="number">2</span>;</span><br><span class="line">        <span class="keyword">if</span>(nums[m]&lt;target)</span><br><span class="line">        &#123;</span><br><span class="line">            l=m+<span class="number">1</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">else</span></span><br><span class="line">            h=m<span class="number">-1</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> l;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>为什么上面的代码就能完成lower_bound的功能呢。可以这样简单分析，nums[m]和target的比较结果有三种：</p>
+<ul>
+<li><code>nums[m]&lt;target</code>。此时，我们想要的结果应该在(m, h]范围内。所以，<code>l=m+1</code>。</li>
+<li><code>nums[m]&gt;target</code>。此时，我们想要的结果应该在[l, m)范围内。所以，<code>h=m-1</code>。</li>
+<li><code>nums[m]==target</code>。这种情况下可以确定一点，(m,h)范围内的数都可以被排除了。关键是m能不能被排除掉。换句话说，假设m正好是应该返回的位置，但是我们把它排除掉了，它还有机会被捞起来吗。答案是可以的。当我们排除了m后，剩下的区间是[l,m-1]，这个区间中所有的元素都小于target，按照二分法的判断，接下来的调整会不断地收缩l，直到最后一轮的区间[m-1,m-1]。这一轮依旧执行<code>l=m+1</code>，导致变量l最终的结果为m。而二分法也正是返回的l，刚合适对应起来。所以，排除掉m是没有问题的。</li>
+</ul>
+<p>下面的代码是以h为基准的lower_bound实现，m的计算结果向h靠近。它返回的是数组中最大的小于target的元素的位置。它返回值的值域为[-1,N)，其中，N是数组的元素个数。当数组中所有的元素都大于等于target时，它返回-1。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">lowerbound</span><span class="params">(<span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt; &amp; nums, <span class="keyword">int</span> target)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">int</span> l = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">int</span> h = nums.<span class="built_in">size</span>()<span class="number">-1</span>;</span><br><span class="line">    <span class="keyword">while</span>(l&lt;=h)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">int</span> m = (l+h+<span class="number">1</span>)/<span class="number">2</span>;</span><br><span class="line">        <span class="keyword">if</span>(nums[m]&lt;target)</span><br><span class="line">        &#123;</span><br><span class="line">            l=m+<span class="number">1</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">else</span></span><br><span class="line">        &#123;</span><br><span class="line">            h=m<span class="number">-1</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> h;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>我们将上面两个版本的lower_bound分别称为lower_boud_l和lower_bound_h，以数组<code>[1,2,3,3,3,3,5,6]</code>为例，说明各种情况下各个版本实现返回的值。</p>
+<table>
+<thead>
+<tr>
+<th>target</th>
+<th>lower_bound_l</th>
+<th>lower_bound_h</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>3</td>
+<td>index : 2, val : 3</td>
+<td>index : 2, val : 3</td>
+</tr>
+<tr>
+<td>4</td>
+<td>index : 6,  val : 5</td>
+<td>index : 5, val : 3</td>
+</tr>
+<tr>
+<td>6</td>
+<td>index : 7,  val : 6</td>
+<td>index : 6,  val : 5</td>
+</tr>
+<tr>
+<td>7</td>
+<td>index : 8,  val : -</td>
+<td>index : 7,  val : 6</td>
+</tr>
+<tr>
+<td>1</td>
+<td>index : 0,  val : 1</td>
+<td>index : -1,  val :  -</td>
+</tr>
+<tr>
+<td>0</td>
+<td>index : 0,  val : 1</td>
+<td>index : -1,  val : -</td>
+</tr>
+</tbody></table>
+<h3 id="upper-bound"><a href="#upper-bound" class="headerlink" title="upper_bound"></a>upper_bound</h3><p>stl的upper_bound返回的是第一个大于target的元素的位置。</p>
+<p>下面的代码以l为基准实现。它与stl的upper_bound一样，返回的是第一个大于target的元素的位置，返回值的值域为[0,N]，N为数组元素的个数。当数组中的元素都小于等于target，它返回N。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">upperbound</span><span class="params">(<span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt; &amp; nums, <span class="keyword">int</span> target)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">int</span> l = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">int</span> h = nums.<span class="built_in">size</span>()<span class="number">-1</span>;</span><br><span class="line">    <span class="keyword">while</span>(l&lt;=h)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">int</span> m = (l+h)/<span class="number">2</span>;</span><br><span class="line">        <span class="keyword">if</span>(nums[m]&lt;=target)</span><br><span class="line">        &#123;</span><br><span class="line">            l = m+<span class="number">1</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">else</span></span><br><span class="line">            h=m<span class="number">-1</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> l;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>下面的代码以h为基准实现。它返回最后的小于等于target的元素的位置，返回值的值域在[-1,N)之间。当所有的元素都大于target时，返回-1。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">upperbound</span><span class="params">(<span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt; &amp; nums, <span class="keyword">int</span> target)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">int</span> l = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">int</span> h = nums.<span class="built_in">size</span>()<span class="number">-1</span>;</span><br><span class="line">    <span class="keyword">while</span>(l&lt;=h)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">int</span> m = (l+h+<span class="number">1</span>)/<span class="number">2</span>;</span><br><span class="line">        <span class="keyword">if</span>(nums[m]&lt;=target)</span><br><span class="line">        &#123;</span><br><span class="line">            l = m+<span class="number">1</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">else</span></span><br><span class="line">            h=m<span class="number">-1</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> h;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>我们将上面两个版本的upper_bound分别称为upper_boud_l和upper_bound_h，以数组<code>[1,2,3,3,3,3,5,6]</code>为例，说明各种情况下各个版本实现返回的值。</p>
+<table>
+<thead>
+<tr>
+<th>target</th>
+<th>upper_bound_l</th>
+<th>upper_bound_h</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>3</td>
+<td>index : 6, val : 5</td>
+<td>index : 5, val : 3</td>
+</tr>
+<tr>
+<td>4</td>
+<td>index : 6, val : 5</td>
+<td>index : 6, val : 5</td>
+</tr>
+<tr>
+<td>6</td>
+<td>index : 8, val : -</td>
+<td>index : 7, val : 6</td>
+</tr>
+<tr>
+<td>7</td>
+<td>index : 8, val : -</td>
+<td>index : 7, val : 6</td>
+</tr>
+<tr>
+<td>1</td>
+<td>index : 1, val : 2</td>
+<td>index : 0, val : 1</td>
+</tr>
+<tr>
+<td>0</td>
+<td>index : 0, val : 1</td>
+<td>index : -1, val : -</td>
+</tr>
+</tbody></table>
+<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><p><img src="/img/%E4%BA%8C%E5%88%86%E6%B3%95/lower_upper_bound%E5%9B%BE%E8%A7%A3.png" alt=""></p>
+<h2 id="旋转数组中找最小值"><a href="#旋转数组中找最小值" class="headerlink" title="旋转数组中找最小值"></a>旋转数组中找最小值</h2><p>题意是这样的，一个升序的，经过了旋转的数组（即从某一位置将数组分为两部分，前半部分元素整体被移动到数组后半部分后面去），找到它的最小值。</p>
+<h3 id="无重复值-leetcode153"><a href="#无重复值-leetcode153" class="headerlink" title="无重复值/leetcode153"></a>无重复值/leetcode153</h3><p><img src="/img/%E4%BA%8C%E5%88%86%E6%B3%95/find1.png" alt=""></p>
+<p>这道题的解法是用m和h对应的值进行比较。其中，<code>m=(l+h)/2</code>。再强调一次，这种写法有溢出的可能。</p>
+<ul>
+<li>如果<code>nums[m]&gt;nums[h]</code>，那么m出现在左半部分。此时可以去掉了l1那部分，包括m本身。对应的代码就是<code>l=m+1</code></li>
+<li>否则<code>nums[m]&lt;nums[h]</code>，那么m出现在右半部分，此时可以去掉l4那部分，但不包括m，因为m对应的值可能为最小值。对应的代码就是<code>h=m</code>。</li>
+<li><code>nums[m]==nums[h]</code>，这只有一种可能——<code>l==h</code>。<code>l&lt;h</code>时，因为m都是贴近l的，所以有<code>l&lt;=m&lt;h</code>，再加上数组中没有相同的数字，所以<code>nums[m]!=nums[h]</code>。为了避开判断<code>nums[m]==nums[h]</code>的情况，我们可以从结束条件入手。如果结束条件是<code>l&lt;h</code>，那么就不会有相等的情况出现。但问题是这个结束条件会不会有漏网之鱼。考虑使用<code>l&lt;h</code>进行判断时，最后一轮的比较情况，最后一轮必定只有两个元素，假设为a和b，那么l和m对应a，h对应b。按照上面提到的进行判断。如果<code>a&lt;b</code>，那么就有<code>h=l</code>，l指向最小值；否则，有<code>l=h</code>，l指向最小值。无论哪种情况，l都指向最小值。所以，使用<code>l&lt;h</code>作为判断条件没有问题。</li>
+</ul>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">findMin</span><span class="params">(<span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt;&amp; nums)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">int</span> l = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">int</span> h = nums.<span class="built_in">size</span>()<span class="number">-1</span>;</span><br><span class="line">    <span class="keyword">while</span>(l&lt;h)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">int</span> m = (l+h)/<span class="number">2</span>;</span><br><span class="line">        <span class="keyword">if</span>(nums[m]&gt;nums[h])</span><br><span class="line">            l=m+<span class="number">1</span>;</span><br><span class="line">        <span class="keyword">else</span> </span><br><span class="line">            h=m;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> nums[l];</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>如果使用<code>l&lt;=h</code>作为结束条件，那么就要额外判断一下相等的情况。如下：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">findMin</span><span class="params">(<span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt;&amp; nums)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">int</span> l = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">int</span> h = nums.<span class="built_in">size</span>()<span class="number">-1</span>;</span><br><span class="line">    <span class="keyword">while</span>(l&lt;=h)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">int</span> m = (l+h)/<span class="number">2</span>;</span><br><span class="line">        <span class="keyword">if</span>(nums[m]&gt;nums[h])</span><br><span class="line">            l=m+<span class="number">1</span>;</span><br><span class="line">        <span class="keyword">else</span> <span class="keyword">if</span>(nums[m]&lt;nums[h])</span><br><span class="line">            h=m;</span><br><span class="line">        <span class="keyword">else</span> <span class="keyword">return</span> nums[l];</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> nums[l];</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="有重复值-leetcode154"><a href="#有重复值-leetcode154" class="headerlink" title="有重复值/leetcode154"></a>有重复值/leetcode154</h3><p><img src="/img/%E4%BA%8C%E5%88%86%E6%B3%95/find2.png" alt=""></p>
+<p>同样使用h和m进行比较。</p>
+<ul>
+<li><p>如果<code>nums[m]&gt;nums[h]</code>，那么m出现在左半部分。此时可以去掉了l1那部分，包括m本身。对应的代码就是<code>l=m+1</code></p>
+</li>
+<li><p>否则<code>nums[m]&lt;nums[h]</code>，那么m出现在右半部分，此时可以去掉l4那部分，但不包括m，因为m对应的值可能为最小值。对应的代码就是<code>h=m</code>。</p>
+</li>
+<li><p><code>nums[m]==nums[h]</code>，这就无法确定了。比如下面的两种情况，最小值可能出现在左边或者右边。不过，可以确定的一点是，我们能够排除h，因为即使h是最小值却被排除了，m那里也依然持有最小值。</p>
+<p><img src="/img/%E4%BA%8C%E5%88%86%E6%B3%95/./%E4%BA%8C%E5%88%86%E6%B3%95/find3.png" alt=""></p>
+</li>
+<li><p>结束条件<code>l&lt;h</code>是可用的，我们可以以同样的方式来分析最后一轮的比较情况。当然，使用<code>l&lt;=h</code>亦可。</p>
+</li>
+</ul>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">findMin</span><span class="params">(<span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt;&amp; v)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">int</span> l = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">int</span> h = v.<span class="built_in">size</span>()<span class="number">-1</span>;</span><br><span class="line">    <span class="keyword">while</span>(l&lt;h)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">int</span> m = (l+h)/<span class="number">2</span>;</span><br><span class="line">        <span class="keyword">if</span>(v[m]&gt;v[h])</span><br><span class="line">            l=m+<span class="number">1</span>;</span><br><span class="line">        <span class="keyword">else</span> <span class="keyword">if</span>(v[m]&lt;v[h])</span><br><span class="line">            h=m;</span><br><span class="line">        <span class="keyword">else</span></span><br><span class="line">            h--;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> v[l];</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="旋转数组中找特定值"><a href="#旋转数组中找特定值" class="headerlink" title="旋转数组中找特定值"></a>旋转数组中找特定值</h2><p>和前面找最小值不同，这次的题目给定了target，需要在数组中找到target的位置。</p>
+<h3 id="无重复值-leetcode33"><a href="#无重复值-leetcode33" class="headerlink" title="无重复值/leetcode33"></a>无重复值/leetcode33</h3><p><img src="/img/%E4%BA%8C%E5%88%86%E6%B3%95/find1.png" alt=""></p>
+<p>和找最小值的解法类似，我们用二分法来一点一点缩小区间。</p>
+<ul>
+<li>如果<code>nums[m]==target</code>，则m就是我们要的结果。</li>
+<li>如果<code>nums[m]&lt;nums[h]</code>，则m位于右半部分。<ul>
+<li>如果<code>nums[m]&lt;target</code>,则说明target可能位于l4,l1和l2中的任意位置。但这三个区间不连续，为此，我们需要对l4单独进行考虑。<ul>
+<li>如果<code>target&lt;=nums[h]</code>，说明target位于l4中。同时，由于<code>nums[m]!=target</code>，所以，缩小区间的代码为<code>l=m+1</code>。</li>
+<li>否则，说明target位于l1和l2中。由于我们不知道l2和l3的分界点在哪里，所以我们的区间只能缩小到l1,l2和l3这三部分。对应的代码为<code>h=m-1</code>。</li>
+</ul>
+</li>
+<li>如果<code>nums[m]&gt;target</code>，则说明target位于l3中。同样由于无法知道l2和l3的分界点，所以区间只能缩小到l1,l2和l3这三部分。即<code>h=m-1</code>。</li>
+</ul>
+</li>
+<li>如果<code>nums[m]&gt;nums[h]</code>，则m位于左半部分。以同样的方法，我们可以分析出剩余情况。</li>
+<li>此外，<code>nums[m]==nums[h]</code>只有当<code>l==h</code>时才会出现。这种情况下，由于没有过<code>nums[m]==target</code>这一判断条件，说明我们的区间中不存在target。这时候，无论怎么偏移l和h都无所谓，因为我们准备返回-1了。因此，我们可以将相等的情况合并到前面的某一个分支中去。</li>
+</ul>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">search</span><span class="params">(<span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt;&amp; nums, <span class="keyword">int</span> target)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">int</span> l = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">int</span> h = nums.<span class="built_in">size</span>()<span class="number">-1</span>;</span><br><span class="line">    <span class="keyword">while</span>(l&lt;=h)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">int</span> m = (l+h)/<span class="number">2</span>;</span><br><span class="line">        <span class="keyword">if</span>(nums[m]==target)</span><br><span class="line">            <span class="keyword">return</span> m;</span><br><span class="line">        <span class="keyword">if</span>(nums[m]&lt;nums[h])</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="keyword">if</span>(nums[m]&lt;target)</span><br><span class="line">            &#123;</span><br><span class="line">                <span class="keyword">if</span>(target&lt;=nums[h])</span><br><span class="line">                    l=m+<span class="number">1</span>;</span><br><span class="line">                <span class="keyword">else</span></span><br><span class="line">                    h=m<span class="number">-1</span>;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">else</span></span><br><span class="line">            &#123;</span><br><span class="line">                h = m<span class="number">-1</span>;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">else</span></span><br><span class="line">        &#123;</span><br><span class="line">            <span class="keyword">if</span>(target&lt;nums[m])</span><br><span class="line">            &#123;</span><br><span class="line">                <span class="keyword">if</span>(target&lt;=nums[h])</span><br><span class="line">                    l=m+<span class="number">1</span>;</span><br><span class="line">                <span class="keyword">else</span></span><br><span class="line">                    h=m<span class="number">-1</span>;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">else</span></span><br><span class="line">            &#123;</span><br><span class="line">                l=m+<span class="number">1</span>;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>根据上面的分析写出来的代码如上所示。为了精简好看，可以将某些分支进行一下合并。这里就不展示了。</p>
+<p>最后，掌握了这个判断方式后，我们可以随意拿捏我们的代码。比如，用<code>l&lt;h</code>作为结束判断，但是后续返回值时多需要多做一点判断工作。或者不用nums[h]<code>进行比较，而是用</code>nums[l]`进行比较。</p>
+<h3 id="有重复值-leetcode81"><a href="#有重复值-leetcode81" class="headerlink" title="有重复值/leetcode81"></a>有重复值/leetcode81</h3><p><img src="/img/%E4%BA%8C%E5%88%86%E6%B3%95/find2.png" alt=""></p>
+<ul>
+<li><p>如果<code>nums[m]==target</code>，则m就是我们要的结果。</p>
+</li>
+<li><p>如果<code>nums[m]&lt;nums[h]</code>，则m位于右半部分。</p>
+<ul>
+<li>如果<code>nums[m]&lt;target</code>,则说明target可能位于l4,l1和l2中的任意位置。但这三个区间不连续，为此，我们需要对l4单独进行考虑。<ul>
+<li>如果<code>target&lt;=nums[h]</code>，说明target位于l4或者l1的前若干个元素中。不过，我们可以排除掉l1那部分，因为如果target出现在了l1中，那么它必定出现在l4中，我们只需要在l4中找就行。同时，由于<code>nums[m]!=target</code>，所以，缩小区间的代码为<code>l=m+1</code>。</li>
+<li>否则，说明target位于l1和l2中。由于我们不知道l2和l3的分界点在哪里，所以我们的区间只能缩小到l1,l2和l3这三部分。对应的代码为<code>h=m-1</code>。</li>
+</ul>
+</li>
+<li>如果<code>nums[m]&gt;target</code>，则说明target位于l3中。同样由于无法知道l2和l3的分界点，所以区间只能缩小到l1,l2和l3这三部分。即<code>h=m-1</code>。</li>
+</ul>
+</li>
+<li><p>如果<code>nums[m]&gt;nums[h]</code>，则m位于左半部分。以同样的方法，我们可以分析出剩余情况。</p>
+</li>
+<li><p>如果<code>nums[m]==nums[h]</code>，那么target的位置是无法确定的。但是，h所在的位置必定不是target所在，我们对h略微进行缩小。即<code>h--</code>。</p>
+<p><img src="/img/%E4%BA%8C%E5%88%86%E6%B3%95/find3.png" alt=""></p>
+</li>
+</ul>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">bool</span> <span class="title">search</span><span class="params">(<span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt;&amp; nums, <span class="keyword">int</span> target)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">int</span> h = nums.<span class="built_in">size</span>()<span class="number">-1</span>;</span><br><span class="line">    <span class="keyword">int</span> l = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">while</span>(l&lt;=h)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">int</span> m=(l+h)/<span class="number">2</span>;</span><br><span class="line">        <span class="keyword">if</span>(nums[m]==target)</span><br><span class="line">            <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">        <span class="keyword">if</span>(nums[m]&gt;nums[h])</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="keyword">if</span>(nums[m]&lt;target)</span><br><span class="line">            &#123;</span><br><span class="line">                l=m+<span class="number">1</span>;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">else</span></span><br><span class="line">            &#123;</span><br><span class="line">                <span class="keyword">if</span>(nums[h]&lt;target)</span><br><span class="line">                    h=m<span class="number">-1</span>;</span><br><span class="line">                <span class="keyword">else</span></span><br><span class="line">                    l=m+<span class="number">1</span>;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">else</span> <span class="keyword">if</span>(nums[m]&lt;nums[h])</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="keyword">if</span>(target&lt;nums[m])</span><br><span class="line">                h=m<span class="number">-1</span>;</span><br><span class="line">            <span class="keyword">else</span></span><br><span class="line">            &#123;</span><br><span class="line">                <span class="keyword">if</span>(nums[h]&lt;target)</span><br><span class="line">                    h=m<span class="number">-1</span>;</span><br><span class="line">                <span class="keyword">else</span></span><br><span class="line">                    l=m+<span class="number">1</span>;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">else</span></span><br><span class="line">        &#123;</span><br><span class="line">            h--;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="总结-1"><a href="#总结-1" class="headerlink" title="总结"></a>总结</h2><p>二分查找的代码是很灵活的，需要具体情况具体分析。不过，它总体的思想是不变的，就是通过二分来不断地缩小查找区间，直到找到目标值或者区间为空。在有重复值的旋转数组中查找时，最坏情况会退化到线性，这点也是与其他正常的二分复杂度为O(logN)是不同的。最后，需要强调一下<code>m=(l+h)/2</code>是会有溢出风险的。</p>
+ 
+</div>
+        </div>
+        <div></div>
+    </div>
+    <div id="footer">
+    <span id="btn-to-top">&#8679;</span>
+    <div id="theme-info">
+        <span>theme:<a href="https://github.com/12-th/ezread" target="_blank" rel="noopener">ezread</a></span>
+    </div>
+</div> 
+</div>
+</body>
+
+</html>
