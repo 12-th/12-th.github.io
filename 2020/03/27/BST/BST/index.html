@@ -21,7 +21,7 @@
 <link rel="stylesheet" href="/css/post.css">
 
     
-<link rel="stylesheet" href="/css/header.css">
+<link rel="stylesheet" href="/css/sidebar.css">
 
     
 <link rel="stylesheet" href="/css/footer.css">
@@ -30,45 +30,52 @@
 <link rel="stylesheet" href="/css/article.css">
 
     
+<link rel="stylesheet" href="/css/btn-to-top.css">
+ 
+    
 <script src="/js/article.js"></script>
 
     
 <script src="/js/post.js"></script>
 
     
-<script src="/js/header.js"></script>
+<script src="/js/sidebar.js"></script>
 
     
 <script src="/js/footer.js"></script>
 
-
-    <div id="header">
     
-<script src="/js/header.js"></script>
+<script src="/js/btn-to-top.js"></script>
+ 
 
-    
-<link rel="stylesheet" href="/css/header.css">
-
+    <div class="post-btns">
+        <div class="sidebar"><div id="header">
     <div id="sidebar">
         <ul>
             <a href="/">主页</a>
-            <a href="#archive">归档</a>
+            <a href="/archives">归档</a>
+            <a href="#">分类</a>
+            <a href="#">tag</a>
         </ul>
     </div>
     <div id="mask"></div>
     <span id="btn-sidebar">&#9776;</span>
-</div>
-    <span id='btn-content'>&#8678;</span>
-    <div id="post-content"></div>
-    <div id="post-grid">
-        <div></div>
-        <div id="post-text">
-            <h1 class='tittle'>
-                
-                BST
-                
-            </h1>
-            <div class="article-text">
+</div></div>
+        <div class="btn-toc">⇦</div>
+    </div>
+    <div class="div-toc">
+            <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#BST"><span class="toc-text">BST</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#判定"><span class="toc-text">判定</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#删除节点"><span class="toc-text">删除节点</span></a></li></ol></li></ol>
+    </div>
+    <div class="post-foot-grid">
+        <div class="post-grid">
+            <div class="padding"></div>
+            <div class="text">
+                <h1 class='tittle'>
+                    
+                    BST
+                    
+                </h1>
+                <div class="article-text">
     <h2 id="BST"><a href="#BST" class="headerlink" title="BST"></a>BST</h2><p>BST，二叉搜索树，binary  search tree。定义如下：</p>
 <ul>
 <li>左子树所有节点的值小于当前节点的值</li>
@@ -85,16 +92,24 @@
 <p>一，如果被删除节点是叶子节点，那么直接删除。<br><img src="/img/BST/remove1.png" alt=""><br>二，如果被删除节点只有左儿子或者右儿子节点，那么直接删除该节点，并把它的父亲与它的左/右儿子连在一起。<br><img src="/img/BST/remove2.png" alt=""><br>三，如果被删除节点左右儿子都有，那么选择它右儿子中最小的那个节点作为替死鬼，把这个替死鬼的值赋给当前节点，并把替死鬼节点删掉。当然，选择左儿子中最大的那个节点也是可行的。<br><img src="/img/BST/remove3.png" alt=""></p>
  
 </div>
+            </div>
         </div>
-        <div></div>
-    </div>
-    <div id="footer">
-    <span id="btn-to-top">&#8679;</span>
-    <div id="theme-info">
+        <div class="foot"><div id="footer">
+    <div class="theme-info">
         <span>theme:<a href="https://github.com/12-th/ezread" target="_blank" rel="noopener">ezread</a></span>
     </div>
-</div> 
+    <div class="about-me">
+        <span>想要给主题push request？<a href="https://github.com/12-th/" target="_blank" rel="noopener">contact me!!!!</a></span>
+    </div>
+</div> </div>
+    </div>
+    <div class="btn-to-top"><div id="btn-to-top">
+    <span id="btn-to-top">&#8679;</span>
+</div></div>
+    <!-- <span id='btn-content'>&#8678;</span> -->
 </div>
+
+
 </body>
 
 </html>

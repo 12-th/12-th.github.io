@@ -21,7 +21,7 @@
 <link rel="stylesheet" href="/css/post.css">
 
     
-<link rel="stylesheet" href="/css/header.css">
+<link rel="stylesheet" href="/css/sidebar.css">
 
     
 <link rel="stylesheet" href="/css/footer.css">
@@ -30,45 +30,52 @@
 <link rel="stylesheet" href="/css/article.css">
 
     
+<link rel="stylesheet" href="/css/btn-to-top.css">
+ 
+    
 <script src="/js/article.js"></script>
 
     
 <script src="/js/post.js"></script>
 
     
-<script src="/js/header.js"></script>
+<script src="/js/sidebar.js"></script>
 
     
 <script src="/js/footer.js"></script>
 
-
-    <div id="header">
     
-<script src="/js/header.js"></script>
+<script src="/js/btn-to-top.js"></script>
+ 
 
-    
-<link rel="stylesheet" href="/css/header.css">
-
+    <div class="post-btns">
+        <div class="sidebar"><div id="header">
     <div id="sidebar">
         <ul>
             <a href="/">主页</a>
-            <a href="#archive">归档</a>
+            <a href="/archives">归档</a>
+            <a href="#">分类</a>
+            <a href="#">tag</a>
         </ul>
     </div>
     <div id="mask"></div>
     <span id="btn-sidebar">&#9776;</span>
-</div>
-    <span id='btn-content'>&#8678;</span>
-    <div id="post-content"></div>
-    <div id="post-grid">
-        <div></div>
-        <div id="post-text">
-            <h1 class='tittle'>
-                
-                用rust写linux模块？(二)
-                
-            </h1>
-            <div class="article-text">
+</div></div>
+        <div class="btn-toc">⇦</div>
+    </div>
+    <div class="div-toc">
+            <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#分析"><span class="toc-text">分析</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#错误一的原因"><span class="toc-text">错误一的原因</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#错误二的原因"><span class="toc-text">错误二的原因</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#试试C"><span class="toc-text">试试C++</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#回到rust"><span class="toc-text">回到rust</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#总结"><span class="toc-text">总结</span></a></li></ol>
+    </div>
+    <div class="post-foot-grid">
+        <div class="post-grid">
+            <div class="padding"></div>
+            <div class="text">
+                <h1 class='tittle'>
+                    
+                    用rust写linux模块？(二)
+                    
+                </h1>
+                <div class="article-text">
     <p>上一篇结尾讲到，重定位报错了。先重复一下上一篇提到的错误：</p>
 <p>在换了个内核版本后得到的错误如下：</p>
 <blockquote>
@@ -174,16 +181,24 @@
 <h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>要编译出能够成功链接到内核模块的代码，得使用<code>-mcmodel=kernel</code>和<code>-fno-pic</code>两个选项，而且，得保证编译出来的文件确实没有使用PLT/GOT才行。现在对于rust的做法有点原始，还得手动改生成的汇编文件。接下来的得研究一下现有的开源项目是怎么处理这个问题的。</p>
  
 </div>
+            </div>
         </div>
-        <div></div>
-    </div>
-    <div id="footer">
-    <span id="btn-to-top">&#8679;</span>
-    <div id="theme-info">
+        <div class="foot"><div id="footer">
+    <div class="theme-info">
         <span>theme:<a href="https://github.com/12-th/ezread" target="_blank" rel="noopener">ezread</a></span>
     </div>
-</div> 
+    <div class="about-me">
+        <span>想要给主题push request？<a href="https://github.com/12-th/" target="_blank" rel="noopener">contact me!!!!</a></span>
+    </div>
+</div> </div>
+    </div>
+    <div class="btn-to-top"><div id="btn-to-top">
+    <span id="btn-to-top">&#8679;</span>
+</div></div>
+    <!-- <span id='btn-content'>&#8678;</span> -->
 </div>
+
+
 </body>
 
 </html>

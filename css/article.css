@@ -3,7 +3,10 @@
     text-decoration: none;
     padding:0 10px;
     font-family: Consolas;
+    border: 1px solid #dee2e6;
     border-left: 1px dotted #ced4da;
+    background-color: #f8f9fa;
+    border-radius: 5px;
 }
 
 .article-text a{
@@ -30,11 +33,11 @@
     color: #495057;
     text-align:right;
     padding-right: 10px;
-    display:inline-table;
+    /* display:table-cell; */
 }
 
 .article-text .code{
-    display:inline-table;
+    /* display:table-cell; */
 }
 
 .article-text .gutter pre{
@@ -135,6 +138,13 @@
     font-style: italic;
 }
 
+.article-text table{
+}
+
+.article-text table td{
+    overflow: auto;
+}
+
 .article-text>table{
     margin : auto auto;
     padding:3px 10px;
@@ -160,7 +170,7 @@
     border-left: 3px solid rgb(3, 169, 244);
 }
 
-.article-text figure .btns{
+.article-text figure .article-btns{
     padding-top:5px;
     padding-bottom:5px;
 }

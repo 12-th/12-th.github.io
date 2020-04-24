@@ -21,7 +21,7 @@
 <link rel="stylesheet" href="/css/post.css">
 
     
-<link rel="stylesheet" href="/css/header.css">
+<link rel="stylesheet" href="/css/sidebar.css">
 
     
 <link rel="stylesheet" href="/css/footer.css">
@@ -30,45 +30,52 @@
 <link rel="stylesheet" href="/css/article.css">
 
     
+<link rel="stylesheet" href="/css/btn-to-top.css">
+ 
+    
 <script src="/js/article.js"></script>
 
     
 <script src="/js/post.js"></script>
 
     
-<script src="/js/header.js"></script>
+<script src="/js/sidebar.js"></script>
 
     
 <script src="/js/footer.js"></script>
 
-
-    <div id="header">
     
-<script src="/js/header.js"></script>
+<script src="/js/btn-to-top.js"></script>
+ 
 
-    
-<link rel="stylesheet" href="/css/header.css">
-
+    <div class="post-btns">
+        <div class="sidebar"><div id="header">
     <div id="sidebar">
         <ul>
             <a href="/">主页</a>
-            <a href="#archive">归档</a>
+            <a href="/archives">归档</a>
+            <a href="#">分类</a>
+            <a href="#">tag</a>
         </ul>
     </div>
     <div id="mask"></div>
     <span id="btn-sidebar">&#9776;</span>
-</div>
-    <span id='btn-content'>&#8678;</span>
-    <div id="post-content"></div>
-    <div id="post-grid">
-        <div></div>
-        <div id="post-text">
-            <h1 class='tittle'>
-                
-                在访问内存时发生了什么
-                
-            </h1>
-            <div class="article-text">
+</div></div>
+        <div class="btn-toc">⇦</div>
+    </div>
+    <div class="div-toc">
+            <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#分段机制"><span class="toc-text">分段机制</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#分页机制"><span class="toc-text">分页机制</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#TLB"><span class="toc-text">TLB</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#cache"><span class="toc-text">cache</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#关于cpu中的各个名词"><span class="toc-text">关于cpu中的各个名词</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#cache的结构"><span class="toc-text">cache的结构</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#MESI协议"><span class="toc-text">MESI协议</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#memory-type"><span class="toc-text">memory type</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#MTRR和PAT"><span class="toc-text">MTRR和PAT</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#其他"><span class="toc-text">其他</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#page-fault"><span class="toc-text">page fault</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#CPU的page-fault"><span class="toc-text">CPU的page fault</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#内核对page-fault的处理"><span class="toc-text">内核对page fault的处理</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#spurious-fault"><span class="toc-text">spurious_fault</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#exception-table"><span class="toc-text">exception table</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#vmalloc-fault"><span class="toc-text">vmalloc fault</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#mmap"><span class="toc-text">mmap</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#stack-fault"><span class="toc-text">stack fault</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#file"><span class="toc-text">file</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#cow"><span class="toc-text">cow</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#惰式分配内存"><span class="toc-text">惰式分配内存</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#其他page-fault"><span class="toc-text">其他page fault</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#mmiotrace，kprobe"><span class="toc-text">mmiotrace，kprobe</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#hugetlb-fult"><span class="toc-text">hugetlb fult</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#SMAP及其他cpu机制引起的fault"><span class="toc-text">SMAP及其他cpu机制引起的fault</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#vsyscall"><span class="toc-text">vsyscall</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#指令预取时触发page-fault"><span class="toc-text">指令预取时触发page fault</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#f00f-bug"><span class="toc-text">f00f bug</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#K8-erratum-100和-93"><span class="toc-text">K8 erratum #100和#93</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#内核的page-fault处理流程"><span class="toc-text">内核的page fault处理流程</span></a></li></ol></li></ol></li></ol>
+    </div>
+    <div class="post-foot-grid">
+        <div class="post-grid">
+            <div class="padding"></div>
+            <div class="text">
+                <h1 class='tittle'>
+                    
+                    在访问内存时发生了什么
+                    
+                </h1>
+                <div class="article-text">
     <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">int</span> * pa;</span><br><span class="line">...<span class="comment">//对pa进行初始化</span></span><br><span class="line"><span class="keyword">int</span> a = *pa;</span><br></pre></td></tr></table></figure>
 
 <p>一行简单的访问地址的代码，背后到底经历了哪些复杂的步骤。</p>
@@ -288,16 +295,24 @@
 </ul>
  
 </div>
+            </div>
         </div>
-        <div></div>
-    </div>
-    <div id="footer">
-    <span id="btn-to-top">&#8679;</span>
-    <div id="theme-info">
+        <div class="foot"><div id="footer">
+    <div class="theme-info">
         <span>theme:<a href="https://github.com/12-th/ezread" target="_blank" rel="noopener">ezread</a></span>
     </div>
-</div> 
+    <div class="about-me">
+        <span>想要给主题push request？<a href="https://github.com/12-th/" target="_blank" rel="noopener">contact me!!!!</a></span>
+    </div>
+</div> </div>
+    </div>
+    <div class="btn-to-top"><div id="btn-to-top">
+    <span id="btn-to-top">&#8679;</span>
+</div></div>
+    <!-- <span id='btn-content'>&#8678;</span> -->
 </div>
+
+
 </body>
 
 </html>

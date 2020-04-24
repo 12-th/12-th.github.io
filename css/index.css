@@ -1,86 +1,49 @@
-#website-info{
-    text-align: center;
-    padding : 10px 0;
-    width:auto;
-    color:#f8f9fa;
-    background-color: #343a40;
-    margin-bottom: 50px;
+.sidebar{
+    position: fixed;
+    left:20px;
+    top:0px;
+    z-index: 3;
 }
 
-#site-tittle{
-    display: inline-block;
-    font-size:40px;
-    font-family: Consolas;
-    margin-right: 10px;
-}
-
-#site-subtitle{
-    display: inline-block;
-    font-size: 15px;
-    font-family: Consolas;
-}
-
-#site-description{
-    display: block;
-    font-size: 15px;
-    font-family: Consolas;
-    margin-top: 10px;
+.index-grid{
+    display:grid;
+    grid-template-rows: auto auto auto 50px;
 }
 
 #articles{
-    width:100%;
+    position: relative;
     display:grid;
-    grid-template-columns:170px auto 170px;
+    grid-template-columns: 125px minmax(500px,auto) 125px;
 }
 
-.per-post{
-    padding:10px 10px;
-    /* background-image: linear-gradient(to right, #ebebeb 0%, #fafafa 50%, #ebebeb 100%); */
-    background-color: #fefefe;
-    border-radius: 2px;
+#pageinator{
+    text-align: center;
     margin-bottom: 40px;
-    box-shadow:inset 0px 0px 1px 1px #dee2e6;
+    margin-top: 20px;
 }
 
-.per-post .post-tittle{
-    text-align:left;
-    vertical-align:bottom;
-    margin:0 0 0 0;
-    padding:0 0 0 0;
-    margin-left: 15px;
-    margin-right: 15px;
-}
-
-.post-split-line-grid{
-    display:grid;
-    grid-template-columns: 15px auto 15px;
-    grid-template-rows: 2px;
-    margin-top: 7px;
-    margin-bottom: 10px;
-}
-
-.post-split-line{
-    background-color: #202020;
-}
-
-.post-more{
-    text-align:right;
-    padding:5px 10px;
-}
-
-.post-more .btn-more{
-    margin:5px 10px;
-    font-size: 15px;
-    cursor: pointer;
-    border-bottom: 3px solid;
+#pageinator a, #pageinator span{
     text-decoration: none;
-    border-color: rgb(58,191,196);
-    color: rgb(58,191,196);
-    bottom:0;
-    right: 0;
+    font-size: 20px;
+    margin-left: 3px;
+    margin-right: 3px;
+    padding:5px;
+    background-color: #ffffff;
+    border: 1px solid #e9ecef;
+    color: #212529;
 }
 
-.post-more .btn-more:hover{
-    color:red;
-    border-color: red;
+#pageinator a:hover{
+    background-color:#15aabf;
+    color: #ffffff;
+}
+
+#pageinator span{
+    color: #ffffff;
+    background-color: #22b8cf;
+    cursor: default;
+}
+
+.foot{
+    bottom:0px;
 }

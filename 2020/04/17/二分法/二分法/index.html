@@ -21,7 +21,7 @@
 <link rel="stylesheet" href="/css/post.css">
 
     
-<link rel="stylesheet" href="/css/header.css">
+<link rel="stylesheet" href="/css/sidebar.css">
 
     
 <link rel="stylesheet" href="/css/footer.css">
@@ -30,45 +30,52 @@
 <link rel="stylesheet" href="/css/article.css">
 
     
+<link rel="stylesheet" href="/css/btn-to-top.css">
+ 
+    
 <script src="/js/article.js"></script>
 
     
 <script src="/js/post.js"></script>
 
     
-<script src="/js/header.js"></script>
+<script src="/js/sidebar.js"></script>
 
     
 <script src="/js/footer.js"></script>
 
-
-    <div id="header">
     
-<script src="/js/header.js"></script>
+<script src="/js/btn-to-top.js"></script>
+ 
 
-    
-<link rel="stylesheet" href="/css/header.css">
-
+    <div class="post-btns">
+        <div class="sidebar"><div id="header">
     <div id="sidebar">
         <ul>
             <a href="/">主页</a>
-            <a href="#archive">归档</a>
+            <a href="/archives">归档</a>
+            <a href="#">分类</a>
+            <a href="#">tag</a>
         </ul>
     </div>
     <div id="mask"></div>
     <span id="btn-sidebar">&#9776;</span>
-</div>
-    <span id='btn-content'>&#8678;</span>
-    <div id="post-content"></div>
-    <div id="post-grid">
-        <div></div>
-        <div id="post-text">
-            <h1 class='tittle'>
-                
-                二分查找
-                
-            </h1>
-            <div class="article-text">
+</div></div>
+        <div class="btn-toc">⇦</div>
+    </div>
+    <div class="div-toc">
+            <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#二分查找-leetcode704"><span class="toc-text">二分查找&#x2F;leetcode704</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#lower-bound和upper-bound-leetcode34"><span class="toc-text">lower_bound和upper_bound&#x2F;leetcode34</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#lower-bound"><span class="toc-text">lower_bound</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#upper-bound"><span class="toc-text">upper_bound</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#总结"><span class="toc-text">总结</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#旋转数组中找最小值"><span class="toc-text">旋转数组中找最小值</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#无重复值-leetcode153"><span class="toc-text">无重复值&#x2F;leetcode153</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#有重复值-leetcode154"><span class="toc-text">有重复值&#x2F;leetcode154</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#旋转数组中找特定值"><span class="toc-text">旋转数组中找特定值</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#无重复值-leetcode33"><span class="toc-text">无重复值&#x2F;leetcode33</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#有重复值-leetcode81"><span class="toc-text">有重复值&#x2F;leetcode81</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#总结-1"><span class="toc-text">总结</span></a></li></ol>
+    </div>
+    <div class="post-foot-grid">
+        <div class="post-grid">
+            <div class="padding"></div>
+            <div class="text">
+                <h1 class='tittle'>
+                    
+                    二分查找
+                    
+                </h1>
+                <div class="article-text">
     <p>二分法其实挺难的，第一个二分查找程序在1946年就公布了，但是第一个没有bug的二分查找程序在1962年才出现。在刷leetcode的时候，很多题加深了我对二分法的认识，这里简要记录一下二分法中相应细节。</p>
 <a id="more"></a>
 <h2 id="二分查找-leetcode704"><a href="#二分查找-leetcode704" class="headerlink" title="二分查找/leetcode704"></a>二分查找/leetcode704</h2><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">search</span><span class="params">(<span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt;&amp; nums, <span class="keyword">int</span> target)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">int</span> l = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">int</span> h = nums.<span class="built_in">size</span>()<span class="number">-1</span>;</span><br><span class="line">    <span class="keyword">while</span>(l&lt;=h)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">int</span> m = (l+h)/<span class="number">2</span>;</span><br><span class="line">        <span class="keyword">if</span>(nums[m]==target)</span><br><span class="line">            <span class="keyword">return</span> m;</span><br><span class="line">        <span class="keyword">if</span>(nums[m]&lt;target)</span><br><span class="line">            l=m+<span class="number">1</span>;</span><br><span class="line">        <span class="keyword">else</span></span><br><span class="line">            h=m<span class="number">-1</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
@@ -265,16 +272,24 @@
 <h2 id="总结-1"><a href="#总结-1" class="headerlink" title="总结"></a>总结</h2><p>二分查找的代码是很灵活的，需要具体情况具体分析。不过，它总体的思想是不变的，就是通过二分来不断地缩小查找区间，直到找到目标值或者区间为空。在有重复值的旋转数组中查找时，最坏情况会退化到线性，这点也是与其他正常的二分复杂度为O(logN)是不同的。最后，需要强调一下<code>m=(l+h)/2</code>是会有溢出风险的。</p>
  
 </div>
+            </div>
         </div>
-        <div></div>
-    </div>
-    <div id="footer">
-    <span id="btn-to-top">&#8679;</span>
-    <div id="theme-info">
+        <div class="foot"><div id="footer">
+    <div class="theme-info">
         <span>theme:<a href="https://github.com/12-th/ezread" target="_blank" rel="noopener">ezread</a></span>
     </div>
-</div> 
+    <div class="about-me">
+        <span>想要给主题push request？<a href="https://github.com/12-th/" target="_blank" rel="noopener">contact me!!!!</a></span>
+    </div>
+</div> </div>
+    </div>
+    <div class="btn-to-top"><div id="btn-to-top">
+    <span id="btn-to-top">&#8679;</span>
+</div></div>
+    <!-- <span id='btn-content'>&#8678;</span> -->
 </div>
+
+
 </body>
 
 </html>
