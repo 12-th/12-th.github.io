@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <script src="https://cdn.bootcss.com/jquery/3.1.0/jquery.min.js"></script>
+  
+<link rel="stylesheet" href="/css/layout.css">
+
+  <title>
+     
+      stl排序算法源码分析
+     
+  </title>
+<meta name="generator" content="Hexo 4.2.0"></head>
+
+<body>
+  <div id='post'>
+    
+<link rel="stylesheet" href="/css/post.css">
+
+    
+<link rel="stylesheet" href="/css/sidebar.css">
+
+    
+<link rel="stylesheet" href="/css/footer.css">
+
+    
+<link rel="stylesheet" href="/css/article.css">
+
+    
+<link rel="stylesheet" href="/css/btn-to-top.css">
+ 
+    
+<script src="/js/article.js"></script>
+
+    
+<script src="/js/post.js"></script>
+
+    
+<script src="/js/sidebar.js"></script>
+
+    
+<script src="/js/footer.js"></script>
+
+    
+<script src="/js/btn-to-top.js"></script>
+ 
+
+    <div class="post-btns">
+        <div class="sidebar"><div id="header">
+    <div id="sidebar">
+        <ul>
+            <a href="/">主页</a>
+            <a href="/archives">归档</a>
+            <a href="/categories ">分类</a>
+            <a href="/tags">tag</a>
+        </ul>
+    </div>
+    <div id="mask"></div>
+    <span id="btn-sidebar">&#9776;</span>
+</div></div>
+        <div class="btn-toc">⇦</div>
+    </div>
+    <div class="div-toc">
+            <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#sort"><span class="toc-text">sort</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#stable-sort"><span class="toc-text">stable_sort</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#merge流程"><span class="toc-text">merge流程</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#带充足buffer的merge"><span class="toc-text">带充足buffer的merge</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#不充足buffer的merge"><span class="toc-text">不充足buffer的merge</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#使用较小buffer的merge"><span class="toc-text">使用较小buffer的merge</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#不使用buffer的merge"><span class="toc-text">不使用buffer的merge</span></a></li></ol></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#stable-sort流程"><span class="toc-text">stable_sort流程</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#inplace-stable-sort"><span class="toc-text">inplace_stable_sort</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#merge-sort-with-buffer"><span class="toc-text">merge_sort_with_buffer</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#stable-sort-adaptive"><span class="toc-text">stable_sort_adaptive</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#stable-sort的整体流程"><span class="toc-text">stable_sort的整体流程</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#源码分析"><span class="toc-text">源码分析</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#inplace-stable-sort-1"><span class="toc-text">inplace_stable_sort</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#merge-sort-with-buffer-1"><span class="toc-text">merge_sort_with_buffer</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#stable-sort-adaptive-1"><span class="toc-text">stable_sort_adaptive</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#list-sort"><span class="toc-text">list.sort</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#源码分析-1"><span class="toc-text">源码分析</span></a></li></ol></li></ol>
+    </div>
+    <div class="post-foot-grid">
+        <div class="post-grid">
+            <div class="padding"></div>
+            <div class="text">
+                <div><h1 class='tittle'>
+                    
+                    stl排序算法源码分析
+                    
+                </h1></div>
+                <div><ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/c/" rel="tag">c++</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/stl/" rel="tag">stl</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E7%AE%97%E6%B3%95/" rel="tag">算法</a></li></ul></div>
+                <div class="article-text">
+    <p>本文以libstdc++的源码作为参考，分析stl中，sort，stable_sort以及list.sort的实现。gcc具体版本不太记得清楚了，看changelog的上次更新是<code>2018-07-05</code>。这个时候的stl版本支持到c++17。</p>
+<h2 id="sort"><a href="#sort" class="headerlink" title="sort"></a>sort</h2><p>sort()是不稳定的，它综合了快排、堆排和插入排序三种算法，并做了一定优化。相比于c库的qsort，我更推荐使用stl的sort，因为它能够将用户自定义的比较函数内联展开，以得到更好的性能。</p>
+<p>影响sort()的使用哪个排序算法的因素主要有两个，分别是数组的长度N和递归深度depth，其中，N的下限是16， depth的上限是<code>log2（N）*2</code>.</p>
+<p>sort算法的流程如下：</p>
+<ul>
+<li>首先，按照快排的方式递归<ul>
+<li>若当前数组范围长度N小于16，直接返回。</li>
+<li>若当前递归深度depth超过了上限，说明快排的partition不太合理导致了递归恶化，将当前数组范围内的所有元素直接进行堆排序。</li>
+<li>否则，将当前范围内的元素进行一次快排的partition，将当前范围分为两个新的子范围，递归向下。</li>
+</ul>
+</li>
+<li>现在，数组大部分是有序的了，对数组进行一次插入排序。</li>
+</ul>
+<p>对应以上流程，现在开始分析源码。为了方便阅读，以下源码省略了模板参数等乱七八糟的东西，变量名也删除了下划线前缀。</p>
+<a id="more"></a>
+
+<p>首先是入口，sort函数调用__sort进行排序，该函数代码如下。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">void</span> __sort(RandomAccessIterator first, RandomAccessIterator last, Compare comp)</span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">if</span> (first != last)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="comment">//快排的递归向下</span></span><br><span class="line">    	<span class="built_in">std</span>::introsort_loop(first, last, lg(last - first) * <span class="number">2</span>, comp);</span><br><span class="line">        <span class="comment">//对整体数组进行的插入排序</span></span><br><span class="line">    	<span class="built_in">std</span>::final_insertion_sort(first, last, comp);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><code>introsort_loop</code>函数的代码如下。不同于我们自己写快排时，对于patition出来的两个子数组会有各有一次递归调用，<code>introsort_loop</code>函数使用了循环替代了其中一个递归调用。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">introsort_loop</span><span class="params">(RandomAccessIterator first, RandomAccessIterator last, Size depth_limit, Compare comp)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="comment">//判断当前数组长度是否大于S_threshold（其值为16）</span></span><br><span class="line">    <span class="keyword">while</span> (last - first &gt; S_threshold)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="comment">//判断递归下降的深度</span></span><br><span class="line">        <span class="keyword">if</span> (depth_limit == <span class="number">0</span>)</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="comment">//如果递归层数太多，说明快排已经不太有效</span></span><br><span class="line">            <span class="comment">//此时直接使用堆排序</span></span><br><span class="line">            <span class="built_in">std</span>::partial_sort(first, last, last, comp);</span><br><span class="line">            <span class="keyword">return</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        --depth_limit;</span><br><span class="line">        <span class="comment">//进行一次patition，pivot从数组开头，结尾和中间三者中选次大值</span></span><br><span class="line">        RandomAccessIterator cut = unguarded_partition_pivot(first, last, comp);</span><br><span class="line">        <span class="comment">//对后半部分数组递归进行排序</span></span><br><span class="line">        introsort_loop(cut, last, depth_limit, comp);</span><br><span class="line">        <span class="comment">//将前半部分数组当做循环的下一轮数组进行排序</span></span><br><span class="line">        <span class="comment">//本质上使用循环代替递归</span></span><br><span class="line">        last = cut;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><code>final_insertion_sort</code>函数是略带一点优化的插入排序，其源码没有多大的分析价值。</p>
+<h2 id="stable-sort"><a href="#stable-sort" class="headerlink" title="stable_sort"></a>stable_sort</h2><p>stable_sort()是stl提供的稳定的排序算法，它综合了归并排序和插入排序，是TIMsort的一个实现。stable_sort的实现的核心在于，在不同buffer大小下，merge的实现方式。</p>
+<p>在描述stable_sort的具体流程前，我们先说明在不同buffer大小下merge的流程。</p>
+<h3 id="merge流程"><a href="#merge流程" class="headerlink" title="merge流程"></a>merge流程</h3><h4 id="带充足buffer的merge"><a href="#带充足buffer的merge" class="headerlink" title="带充足buffer的merge"></a>带充足buffer的merge</h4><p>如果<code>buffer大小 &gt;= 待merge数组的总大小</code>，那么merge就很简单了。只需要不断将两个待merge数组中较小的数复制到buffer中即可。</p>
+<h4 id="不充足buffer的merge"><a href="#不充足buffer的merge" class="headerlink" title="不充足buffer的merge"></a>不充足buffer的merge</h4><p>stl分配的用于merge的buffer大小，有着一个上限。因此会出现<code>buffer的大小 &lt;= 待merge数组的总大小</code>这种情况。</p>
+<p>此时，根据buffer的大小，还要细分为两种情况进行讨论，在这之前，我们记<code>[first, middle)</code>作为第一个待merge的数组（数组1），它的长度为len1，<code>[middle, last)</code>作为第二个被merge的数组（数组2），它的长度为len2。</p>
+<h5 id="使用较小buffer的merge"><a href="#使用较小buffer的merge" class="headerlink" title="使用较小buffer的merge"></a>使用较小buffer的merge</h5><p>当<code>buffer.size() &gt;= min(len1, len2)</code>时，如果<code>len1&lt;=len2</code>，先将数组1的元素拷贝到buffer中，然后再从前往后，将buffer中的元素与[middle, last)范围内的数据merge到[first, last)范围内。merge的时间复杂度是O(len1+len2)。<br><img src="/img/stl%E6%8E%92%E5%BA%8F%E7%AE%97%E6%B3%95%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/buffer%E8%BE%83%E5%A4%A7%E6%97%B6merge.png" alt=""></p>
+<p>如果<code>len1&gt;len2</code>，将数组2的元素拷贝到buffer中，然后从后往前，进行merge。</p>
+<p><img src="/img/stl%E6%8E%92%E5%BA%8F%E7%AE%97%E6%B3%95%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/buffer%E8%BE%83%E5%A4%A7%E6%97%B6merge2.png" alt=""></p>
+<p>总的来说，只要buffer能够容纳其中一个数组，就能够以O(len1+len2)的复杂度进行merge。</p>
+<h5 id="不使用buffer的merge"><a href="#不使用buffer的merge" class="headerlink" title="不使用buffer的merge"></a>不使用buffer的merge</h5><p>当<code>buffer.size() &lt; min(len1, len2)</code>时，如果<code>len1&gt;len2</code>，先将len1对半分割，得到数组1的中间部分的位置为first_cut。然后根据first_cut的值去数组2中找到第一个大于<code>*first_cut</code>的值对应的位置(lower_bound)，记为second_cut。如下图所示：</p>
+<p><img src="/img/stl%E6%8E%92%E5%BA%8F%E7%AE%97%E6%B3%95%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/%E6%97%A0buffer%E7%9A%84merge1.png" alt=""></p>
+<p>现在，<code>[middle, second_cut)</code>范围内的元素一定小于等于<code>[first_cut, middle)</code>，将这两个范围内的元素进行旋转，得到new_middle，即<code>first_cut+(second_cut - middle)</code>的值。</p>
+<p><img src="/img/stl%E6%8E%92%E5%BA%8F%E7%AE%97%E6%B3%95%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/%E6%97%A0buffer%E7%9A%84merge2.png" alt=""></p>
+<p>接下来再对[first, first_cut)和[first_cut, new_middle)范围内的数据递归地进行merge，同样，对于[new_middle, second_cut)和[second_cut, last)范围内的数据也要递归地进行merge。递归地进行merge时，在实现上有所差别。当buffer是真的分配不出来，长度确实为0时，则递归调用自身。但是，如果是buffer分配出来了，但小于两个待merge数组，那么经过这次旋转调整以后，说不定它的buffer长度就长于某个待merge数组了，这时候可以退化到另外两种merge情况中去。</p>
+<p>如果<code>len1&lt;len2</code>，思路是一样的，只是将len2对半分割，而不是len1，接下来去数组1中找到第一个大于等于*second_cut的值对应的位置，同样进行旋转，接下来的流程略。</p>
+<p>至于旋转的代码实现，这又是另一个复杂的问题了。</p>
+<h3 id="stable-sort流程"><a href="#stable-sort流程" class="headerlink" title="stable_sort流程"></a>stable_sort流程</h3><p>直接给出整体流程，会把人绕晕。我们先给出拆解出来的各个部分的子流程，最后再把它们综合起来。</p>
+<h4 id="inplace-stable-sort"><a href="#inplace-stable-sort" class="headerlink" title="inplace_stable_sort"></a>inplace_stable_sort</h4><p><code>inplace_stable_sort</code>这个函数是在完全不使用buffer的情况下进行的merge sort。它所使用的merge函数称为<code>merge_without_buffer</code>。</p>
+<p><code>merge_without_buffer</code>函数对应上文中提到的不使用buffer的merge流程。当它将数组旋转调整后，对更小范围内（如[first, first_cut)和[first_cut, new_middle)范围）的元素进行merge时，它递归调用自身。</p>
+<p><code>inplace_stable_sort</code>的流程如下：</p>
+<ul>
+<li>如果待排序的元素小于15个，直接进行插入排序后返回。</li>
+<li>否则，二分数组，对二分出来的每一部分递归调用inplace_stable_sort使该部分有序。</li>
+<li>接下来，对于划分出来的两个部分，调用<code>merge_without_buffer</code>对其进行合并。</li>
+</ul>
+<h4 id="merge-sort-with-buffer"><a href="#merge-sort-with-buffer" class="headerlink" title="merge_sort_with_buffer"></a>merge_sort_with_buffer</h4><p><code>merge_sort_with_buffer</code>这个函数是在<code>buffer大小 &gt;= 待merge数组的总大小</code>时进行的merge sort。和我们自己写的简单的merge sort相比，它做了一些优化。具体流程如下：</p>
+<ul>
+<li>首先，对于数组内的元素，每7个一组，组内调用插入排序使得组内有序。</li>
+<li>接下来，以循环替代递归进行merge sort。先定义一个变量step_size，表示每次循环时，以step_size个元素为一组进行处理，step_size的初始值为7。循环结束条件是step_size大于数组总大小。每次循环内部也有优化，具体如下：<ul>
+<li>先按照step_size为一组，每两组之间调用<code>move_merge</code>函数进行一次merge。<code>move_merge</code>是按照上文中提到的带充足buffer的merge所实现的函数。</li>
+<li>现在，所有的元素都merge到了buffer中。</li>
+<li>step_size二倍增长。</li>
+<li>接下来，将buffer中所有的元素，再次以step_size为一组，每两组之间进行一次<code>move merge</code>。</li>
+<li>现在，buffer中元素又以merge的形式被拷贝到了原数组中。</li>
+<li>step_size再次二倍增长。</li>
+</ul>
+</li>
+</ul>
+<h4 id="stable-sort-adaptive"><a href="#stable-sort-adaptive" class="headerlink" title="stable_sort_adaptive"></a>stable_sort_adaptive</h4><p><code>stable_sort_adaptive</code>与<code>inplace_stable_sort</code>相对，在有buffer情况下进行merge sort。它所使用的merge函数称为<code>merge_adaptive</code>。</p>
+<p>和inplace_stable_sort<code>所使用的</code>merge_without_buffer<code>所不同的是，当</code>merge_adaptive`将数组旋转调整后，对更小范围内（如[first, first_cut)和[first_cut, new_middle)范围）的元素进行merge时，当它检测到[first, first_cut)和[first_cut, new_middle)这两部分中任意一部分的元素个数可以被buffer容纳下时，它将进行 使用较小buffer的merge 中描述的流程进行merge，而不再是递归调用自身。</p>
+<p><code>stable_sort_adaptive</code>的流程如下：</p>
+<ul>
+<li>将数组二分。</li>
+<li>如果二分后子数组的长度大于buffer大小，则对每个子数组递归调用<code>stable_sort_adaptive</code>，使子数组有序。</li>
+<li>否则，对每个子数组调用<code>merge_sort_with_buffer</code>使其有序。</li>
+<li>现在，两个子数组有序了。调用<code>merge_adaptive</code>对两个子数组进行合并。</li>
+</ul>
+<h4 id="stable-sort的整体流程"><a href="#stable-sort的整体流程" class="headerlink" title="stable_sort的整体流程"></a>stable_sort的整体流程</h4><p>在描述完一系列的merge sort的实现后，我们终于可以给出stable_sort的整体流程了。</p>
+<ul>
+<li>首先，尝试分配与数组相同大小的buffer</li>
+<li>如果buffer分配完全失败，即buffer大小为0，这调用<code>inplace_stable_sort</code>。</li>
+<li>否则， 调用<code>stable_sort_adaptive</code></li>
+</ul>
+<h3 id="源码分析"><a href="#源码分析" class="headerlink" title="源码分析"></a>源码分析</h3><p>我们按照stable_sort流程中，拆解出来每一个部分，依次解释源码的实现。</p>
+<h4 id="inplace-stable-sort-1"><a href="#inplace-stable-sort-1" class="headerlink" title="inplace_stable_sort"></a>inplace_stable_sort</h4><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// [first, last)区间为待排序区间</span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">inplace_stable_sort</span><span class="params">(RandomAccessIterator first,</span></span></span><br><span class="line"><span class="function"><span class="params">            RandomAccessIterator last, Compare comp)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (last - first &lt; <span class="number">15</span>)&#123;</span><br><span class="line">        <span class="comment">//元素个数小于15时，直接插入排序并返回</span></span><br><span class="line">        <span class="built_in">std</span>::insertion_sort(first, last, comp);</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">//二分并递归调用自身，使得子数组有序</span></span><br><span class="line">    _RandomAccessIterator middle = first + (last - first) / <span class="number">2</span>;</span><br><span class="line">    <span class="built_in">std</span>::inplace_stable_sort(first, middle, comp);</span><br><span class="line">    <span class="built_in">std</span>::inplace_stable_sort(middle, last, comp);</span><br><span class="line">    <span class="comment">//不带buffer的merge操作</span></span><br><span class="line">    <span class="built_in">std</span>::merge_without_buffer(first, middle, last,</span><br><span class="line">                middle - first,last - middle,comp);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>merge_without_buffer的源码如下：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">merge_without_buffer</span><span class="params">(BidirectionalIterator first,</span></span></span><br><span class="line"><span class="function"><span class="params">            BidirectionalIterator middle,</span></span></span><br><span class="line"><span class="function"><span class="params">            BidirectionalIterator last,</span></span></span><br><span class="line"><span class="function"><span class="params">            Distance len1, Distance len2,</span></span></span><br><span class="line"><span class="function"><span class="params">            Compare comp)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="comment">//临界条件判断，用于递归结束</span></span><br><span class="line">    <span class="keyword">if</span> (len1 == <span class="number">0</span> || len2 == <span class="number">0</span>)</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (len1 + len2 == <span class="number">2</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">if</span> (comp(middle, first))</span><br><span class="line">        <span class="built_in">std</span>::iter_swap(first, middle);</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    BidirectionalIterator first_cut = first;</span><br><span class="line">    BidirectionalIterator second_cut = middle;</span><br><span class="line">    Distance len11 = <span class="number">0</span>;</span><br><span class="line">    Distance len22 = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">if</span> (len1 &gt; len2)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="comment">//对数组进行旋转调整</span></span><br><span class="line">        len11 = len1 / <span class="number">2</span>;</span><br><span class="line">        <span class="built_in">std</span>::advance(first_cut, len11);</span><br><span class="line">        second_cut</span><br><span class="line">        = <span class="built_in">std</span>::lower_bound(middle, last, *first_cut,</span><br><span class="line">                    gnu_cxx::ops::iter_comp_val(comp));</span><br><span class="line">        len22 = <span class="built_in">std</span>::distance(middle, second_cut);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">else</span></span><br><span class="line">    &#123;</span><br><span class="line">        <span class="comment">//另一种情况下的旋转调整</span></span><br><span class="line">        len22 = len2 / <span class="number">2</span>;</span><br><span class="line">        <span class="built_in">std</span>::advance(second_cut, len22);</span><br><span class="line">        first_cut</span><br><span class="line">        = <span class="built_in">std</span>::upper_bound(first, middle, *second_cut,</span><br><span class="line">                    gnu_cxx::ops::val_comp_iter(comp));</span><br><span class="line">        len11 = <span class="built_in">std</span>::distance(first, first_cut);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    BidirectionalIterator new_middle = <span class="built_in">std</span>::rotate(first_cut, middle, second_cut);</span><br><span class="line">    <span class="comment">//现在需要被merge的范围缩小了，继续递归调用自身进行merge</span></span><br><span class="line">    <span class="built_in">std</span>::merge_without_buffer(first, first_cut, new_middle,</span><br><span class="line">                len11, len22, comp);</span><br><span class="line">    <span class="built_in">std</span>::merge_without_buffer(new_middle, second_cut, last,</span><br><span class="line">                len1 - len11, len2 - len22, comp);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="merge-sort-with-buffer-1"><a href="#merge-sort-with-buffer-1" class="headerlink" title="merge_sort_with_buffer"></a>merge_sort_with_buffer</h4><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">merge_sort_with_buffer</span><span class="params">(RandomAccessIterator first,</span></span></span><br><span class="line"><span class="function"><span class="params">                RandomAccessIterator last,</span></span></span><br><span class="line"><span class="function"><span class="params">                Pointer <span class="built_in">buffer</span>, Compare comp)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">const</span> Distance len = last - first;</span><br><span class="line">    <span class="keyword">const</span> Pointer buffer_last = <span class="built_in">buffer</span> + len;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//_S_chunk_size=7</span></span><br><span class="line">    Distance step_size = _S_chunk_size;</span><br><span class="line">    <span class="comment">//每7个一组，进行组内插入排序</span></span><br><span class="line">    <span class="built_in">std</span>::chunk_insertion_sort(first, last, step_size, comp);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">while</span> (step_size &lt; len)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="comment">//每step_size个一组，两组之间进行合并</span></span><br><span class="line">        <span class="comment">//元素从原数组拷贝到buffer</span></span><br><span class="line">        <span class="built_in">std</span>::merge_sort_loop(first, last, <span class="built_in">buffer</span>,</span><br><span class="line">                    step_size, comp);</span><br><span class="line">        step_size *= <span class="number">2</span>;</span><br><span class="line">        <span class="comment">//元素从buffer拷贝到原数组</span></span><br><span class="line">        <span class="built_in">std</span>::merge_sort_loop(<span class="built_in">buffer</span>, buffer_last, first,</span><br><span class="line">                    step_size, comp);</span><br><span class="line">        step_size *= <span class="number">2</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="stable-sort-adaptive-1"><a href="#stable-sort-adaptive-1" class="headerlink" title="stable_sort_adaptive"></a>stable_sort_adaptive</h4><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">stable_sort_adaptive</span><span class="params">(RandomAccessIterator first,</span></span></span><br><span class="line"><span class="function"><span class="params">            RandomAccessIterator last,</span></span></span><br><span class="line"><span class="function"><span class="params">            Pointer <span class="built_in">buffer</span>, Distance buffer_size,</span></span></span><br><span class="line"><span class="function"><span class="params">            Compare comp)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">const</span> Distance len = (last - first + <span class="number">1</span>) / <span class="number">2</span>;</span><br><span class="line">    <span class="keyword">const</span> RandomAccessIterator middle = first + len;</span><br><span class="line">    <span class="keyword">if</span> (len &gt; buffer_size)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="comment">//对每个子数组递归调用stable_sort_adaptive，使子数组有序</span></span><br><span class="line">        <span class="built_in">std</span>::stable_sort_adaptive(first, middle, <span class="built_in">buffer</span>, buffer_size, comp);</span><br><span class="line">        <span class="built_in">std</span>::stable_sort_adaptive(middle, last, <span class="built_in">buffer</span>, buffer_size, comp);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">else</span></span><br><span class="line">    &#123;</span><br><span class="line">        <span class="comment">//每个子数组调用merge_sort_with_buffer使其有序</span></span><br><span class="line">        <span class="built_in">std</span>::merge_sort_with_buffer(first, middle, <span class="built_in">buffer</span>, comp);</span><br><span class="line">        <span class="built_in">std</span>::merge_sort_with_buffer(middle, last, <span class="built_in">buffer</span>, comp);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">//现在，两个子数组有序了。调用merge_adaptive对两个子数组进行合并</span></span><br><span class="line">    <span class="built_in">std</span>::merge_adaptive(first, middle, last,</span><br><span class="line">            Distance(middle - first),</span><br><span class="line">            Distance(last - middle),</span><br><span class="line">            <span class="built_in">buffer</span>, buffer_size, comp);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">merge_adaptive</span><span class="params">(BidirectionalIterator first,</span></span></span><br><span class="line"><span class="function"><span class="params">		     BidirectionalIterator middle,</span></span></span><br><span class="line"><span class="function"><span class="params">		     BidirectionalIterator last,</span></span></span><br><span class="line"><span class="function"><span class="params">		     Distance len1, Distance len2,</span></span></span><br><span class="line"><span class="function"><span class="params">		     Pointer <span class="built_in">buffer</span>, Distance buffer_size,</span></span></span><br><span class="line"><span class="function"><span class="params">		     Compare comp)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="comment">//前半部分短，而且buffer能装下前半部分</span></span><br><span class="line">    <span class="keyword">if</span> (len1 &lt;= len2 &amp;&amp; len1 &lt;= buffer_size)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="comment">//把前半部分拷贝到buffer里面去</span></span><br><span class="line">        Pointer buffer_end = _GLIBCXX_MOVE3(first, middle, <span class="built_in">buffer</span>);</span><br><span class="line">        <span class="comment">//进行merge</span></span><br><span class="line">        <span class="built_in">std</span>::move_merge_adaptive(<span class="built_in">buffer</span>, buffer_end, middle, last,</span><br><span class="line">                        first, comp);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">else</span> <span class="keyword">if</span> (len2 &lt;= buffer_size)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="comment">//拷贝后半部分到buffer并进行merge</span></span><br><span class="line">        Pointer buffer_end = _GLIBCXX_MOVE3(middle, last, <span class="built_in">buffer</span>);</span><br><span class="line">        <span class="built_in">std</span>::move_merge_adaptive_backward(first, middle, <span class="built_in">buffer</span>,</span><br><span class="line">                            buffer_end, last, comp);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">else</span></span><br><span class="line">    &#123;</span><br><span class="line">        <span class="comment">//旋转并调整</span></span><br><span class="line">        ...</span><br><span class="line">        <span class="comment">//递归调用自身，对更小范围内的元素进行merge</span></span><br><span class="line">        <span class="built_in">std</span>::merge_adaptive(first, first_cut, new_middle, len11,</span><br><span class="line">                len22, <span class="built_in">buffer</span>, buffer_size, comp);</span><br><span class="line">        <span class="built_in">std</span>::merge_adaptive(new_middle, second_cut, last,</span><br><span class="line">                len1 - len11,</span><br><span class="line">                len2 - len22, <span class="built_in">buffer</span>,</span><br><span class="line">                buffer_size, comp);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="list-sort"><a href="#list-sort" class="headerlink" title="list.sort"></a>list.sort</h2><p>stl的链表排序，不要调用<code>std::sort</code>，而是要调用它的成员函数sort。具体的原因可以参考《effective stl》。</p>
+<p>链表也可以进行快排或者归并排序，libstdc++中，用的是归并排序。</p>
+<p>作为stl库，链表的归并排序肯定是不能用递归实现的，取而代之的是由64个链表头构成的数组实现的循环。具体流程如下：</p>
+<ul>
+<li>如果链表为空或者只有一个节点，则直接返回。</li>
+<li>否则，每一轮循环从链表中取下一个节点，放到一个称为carry的链表中，直到原链表为空。<ul>
+<li>每一轮循环中，从0号链表头开始往后遍历。<ul>
+<li>如果当前链表头为空，则carry链表放到该链表头中，然后循环结束。</li>
+<li>否则，carry链表将当前链表头持有的链表合并，然后当前链表头置空。</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>现在，从0号链表头开始，将其中所有的链表合并起来。最终所得到的链表即为排序后的链表。</li>
+</ul>
+<p>以一个简单的例子来描述上述的流程。比如我们的链表为<code>[4,7,3,1,5,2]</code>，</p>
+<ul>
+<li>第一轮循环，0号链表持有<code>[4]</code></li>
+<li>第二轮循环，1号链表持有<code>[4,7]</code>，0号链表为<code>[]</code></li>
+<li>第三轮循环，1号链表持有<code>[4,7]</code>，0号链表为<code>[3]</code></li>
+<li>第四轮循环，2号链表持有<code>[1,3,4,7]</code>，1号链表为<code>[]</code>，0号链表为<code>[]</code></li>
+<li>第五轮循环，2号链表持有<code>[1,3,4,7]</code>，1号链表为<code>[]</code>，0号链表为<code>[5]</code></li>
+<li>第六轮循环，2号链表持有<code>[1,3,4,7]</code>，1号链表为<code>[2,5]</code>，0号链表为<code>[]</code></li>
+</ul>
+<p>循环结束后，将0、1、2共3号链表合并起来，得到<code>[1,2,3,4,5,7]</code></p>
+<h3 id="源码分析-1"><a href="#源码分析-1" class="headerlink" title="源码分析"></a>源码分析</h3><p>实际上，stl的源码实现比我们上面描述的流程稍微复杂些。它还有一个名为fill的链表头指针，指向最大的不为空的链表头的下一个链表头。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">list::sort</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="comment">//排除掉链表节点个数为0和1的情况。</span></span><br><span class="line">    <span class="keyword">if</span> (<span class="keyword">this</span>-&gt;impl.node.next != &amp;<span class="keyword">this</span>-&gt;impl.node</span><br><span class="line">    &amp;&amp; <span class="keyword">this</span>-&gt;impl.node.next-&gt;next != &amp;<span class="keyword">this</span>-&gt;impl.node)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="built_in">list</span> carry;</span><br><span class="line">        <span class="built_in">list</span> tmp[<span class="number">64</span>];</span><br><span class="line">        <span class="built_in">list</span> * <span class="built_in">fill</span> = tmp;</span><br><span class="line">        <span class="built_in">list</span> * counter;</span><br><span class="line">        <span class="keyword">do</span></span><br><span class="line">        &#123;</span><br><span class="line">            <span class="comment">//取下this的第一个节点，放到carry链表中</span></span><br><span class="line">            carry.splice(carry.<span class="built_in">begin</span>(), *<span class="keyword">this</span>, <span class="built_in">begin</span>());</span><br><span class="line"></span><br><span class="line">            <span class="keyword">for</span>(counter = tmp;</span><br><span class="line">                <span class="comment">//counter到达fill节点时或者counter指向的链表为空时，都表明可以容纳carry链表。</span></span><br><span class="line">                counter != <span class="built_in">fill</span> &amp;&amp; !counter-&gt;empty();</span><br><span class="line">                ++counter)</span><br><span class="line">            &#123;</span><br><span class="line">                <span class="comment">//这两步将当前链表头持有的链表（即counter），和carry链表进行合并，其结果放到carry链表中。</span></span><br><span class="line">                counter-&gt;merge(carry);</span><br><span class="line">                carry.swap(*counter);</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="comment">//将carry链表放到counter指向的链表头中。</span></span><br><span class="line">            carry.swap(*counter);</span><br><span class="line">            <span class="comment">//更新fill</span></span><br><span class="line">            <span class="keyword">if</span> (counter == <span class="built_in">fill</span>)</span><br><span class="line">            ++<span class="built_in">fill</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">while</span> (!empty());</span><br><span class="line">		<span class="comment">//将tmp上从0到fill上所有的链表进行合并。合并的结果放到(fill-1)所指向的链表头中</span></span><br><span class="line">        <span class="keyword">for</span> (counter = tmp + <span class="number">1</span>; counter != <span class="built_in">fill</span>; ++counter)</span><br><span class="line">            counter-&gt;merge(*(counter - <span class="number">1</span>));</span><br><span class="line">        <span class="comment">//与(fill-1)所指向的链表头进行交换，this就能拿到最终结果了。</span></span><br><span class="line">        swap( *(<span class="built_in">fill</span> - <span class="number">1</span>) );</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+ 
+</div>
+            </div>
+        </div>
+        <div class="foot"><div id="footer">
+    <div class="theme-info">
+        <span>theme:<a href="https://github.com/12-th/ezread" target="_blank" rel="noopener">ezread</a></span>
+    </div>
+    <div class="about-me">
+        <span>想要给主题push request？<a href="https://github.com/12-th/" target="_blank" rel="noopener">contact me!!!!</a></span>
+    </div>
+</div> </div>
+    </div>
+    <div class="btn-to-top"><div id="btn-to-top">
+    <span id="btn-to-top">&#8679;</span>
+</div></div>
+</div>
+
+
+</body>
+
+</html>
