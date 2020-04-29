@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <script src="https://cdn.bootcss.com/jquery/3.1.0/jquery.min.js"></script>
+  
+<link rel="stylesheet" href="/css/layout.css">
+
+  <title>
+     
+      常见排序算法整理
+     
+  </title>
+<meta name="generator" content="Hexo 4.2.0"></head>
+
+<body>
+  <div id='post'>
+    
+<link rel="stylesheet" href="/css/post.css">
+
+    
+<link rel="stylesheet" href="/css/sidebar.css">
+
+    
+<link rel="stylesheet" href="/css/footer.css">
+
+    
+<link rel="stylesheet" href="/css/article.css">
+
+    
+<link rel="stylesheet" href="/css/btn-to-top.css">
+ 
+    
+<script src="/js/article.js"></script>
+
+    
+<script src="/js/post.js"></script>
+
+    
+<script src="/js/sidebar.js"></script>
+
+    
+<script src="/js/footer.js"></script>
+
+    
+<script src="/js/btn-to-top.js"></script>
+ 
+
+    <div class="post-btns">
+        <div class="sidebar"><div id="header">
+    <div id="sidebar">
+        <ul>
+            <a href="/">主页</a>
+            <a href="/archives">归档</a>
+            <a href="/categories ">分类</a>
+            <a href="/tags">tag</a>
+        </ul>
+    </div>
+    <div id="mask"></div>
+    <span id="btn-sidebar">&#9776;</span>
+</div></div>
+        <div class="btn-toc">⇦</div>
+    </div>
+    <div class="div-toc">
+            <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#写在开头的东西"><span class="toc-text">写在开头的东西</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#测试数据"><span class="toc-text">测试数据</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#桶排"><span class="toc-text">桶排</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#计数排序"><span class="toc-text">计数排序</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#基数排序"><span class="toc-text">基数排序</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#快排"><span class="toc-text">快排</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#归并"><span class="toc-text">归并</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#堆排"><span class="toc-text">堆排</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#冒泡"><span class="toc-text">冒泡</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#选择"><span class="toc-text">选择</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#插入"><span class="toc-text">插入</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#希尔排序"><span class="toc-text">希尔排序</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#总结"><span class="toc-text">总结</span></a></li></ol>
+    </div>
+    <div class="post-foot-grid">
+        <div class="post-grid">
+            <div class="padding"></div>
+            <div class="text">
+                <div><h1 class='tittle'>
+                    
+                    常见排序算法整理
+                    
+                </h1></div>
+                <div><ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/c/" rel="tag">c++</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E7%AE%97%E6%B3%95/" rel="tag">算法</a></li></ul></div>
+                <div class="article-text">
+    <p>总结一下排序算法。</p>
+<h2 id="写在开头的东西"><a href="#写在开头的东西" class="headerlink" title="写在开头的东西"></a>写在开头的东西</h2><p>排序算法分为两种，一种是基于比较的排序，比如快排、归并、堆排等等，另一种是基于计数的排序，比如桶排序，基数排序。使用决策树可以证明，基于比较的排序算法的时间复杂度最好也不会低于O(NlogN)，而计数排序的时间复杂度则可以达到O(N)，但是它也有着自己的适用范围。</p>
+<h2 id="测试数据"><a href="#测试数据" class="headerlink" title="测试数据"></a>测试数据</h2><p>以leetcode 912作测试。这个题目就是让排序一个数组，有如下前提条件：</p>
+<blockquote>
+<ul>
+<li><code>1 &lt;= nums.length &lt;= 50000</code></li>
+<li><code>-50000 &lt;= nums[i] &lt;= 50000</code></li>
+</ul>
+</blockquote>
+<p>这道题可以用来测试各种排序算法到底写的对不对，效率怎么样。</p>
+<h2 id="桶排"><a href="#桶排" class="headerlink" title="桶排"></a>桶排</h2><p>这是O(N)的排序算法，优点是快，空间换时间，缺点是需要知道给定数据的范围，而且这个范围不能过大。</p>
+<a id="more"></a>
+
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt; <span class="title">sortArray</span><span class="params">(<span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt;&amp; nums)</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt; <span class="title">buckets</span><span class="params">(<span class="number">100001</span>)</span></span>;</span><br><span class="line">    <span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt; res;</span><br><span class="line">    res.reserve(nums.<span class="built_in">size</span>());</span><br><span class="line">    <span class="keyword">for</span>(<span class="keyword">int</span> val : nums)</span><br><span class="line">    &#123;</span><br><span class="line">        buckets[val+<span class="number">50000</span>]++;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">for</span>(<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; buckets.<span class="built_in">size</span>();)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">if</span>(buckets[i])</span><br><span class="line">        &#123;</span><br><span class="line">            res.push_back(i<span class="number">-50000</span>);</span><br><span class="line">            buckets[i]--;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">else</span></span><br><span class="line">            ++i;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> res;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="计数排序"><a href="#计数排序" class="headerlink" title="计数排序"></a>计数排序</h2><p>这个算法和桶排序差不多，但是在后续的处理上有所不同。它会把之前统计的所有计数累加起来（stl的partial_sum），然后用这些累加的结果作为对应元素的索引。整体实现其实有点巧妙，不过也不难，代码如下：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt; <span class="title">sortArray</span><span class="params">(<span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt;&amp; nums)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">int</span> N = <span class="number">100001</span>;</span><br><span class="line">    <span class="keyword">int</span> base = <span class="number">50000</span>;</span><br><span class="line">    <span class="function"><span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt; <span class="title">v</span><span class="params">(N, <span class="number">0</span>)</span></span>;</span><br><span class="line">    <span class="keyword">for</span>(<span class="keyword">int</span> val : nums)</span><br><span class="line">    &#123;</span><br><span class="line">        v[val+base]++;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">for</span>(<span class="keyword">int</span> i = <span class="number">1</span>; i &lt; N; ++i)</span><br><span class="line">    &#123;</span><br><span class="line">        v[i] = v[i<span class="number">-1</span>]+v[i];</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt; <span class="title">res</span><span class="params">(nums.<span class="built_in">size</span>())</span></span>;</span><br><span class="line">    <span class="keyword">for</span>(<span class="keyword">int</span> i = nums.<span class="built_in">size</span>()<span class="number">-1</span>; i&gt;=<span class="number">0</span>; --i)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">int</span> val = nums[i];</span><br><span class="line">        v[base+val]--;</span><br><span class="line">        res[v[base+val]] = val;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> res;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="基数排序"><a href="#基数排序" class="headerlink" title="基数排序"></a>基数排序</h2><p>与桶排序有关的另一个算法是基数排序。这里不好展示。它的原理是多次使用桶排序。比如说有如下元素：<code>[100, 131, 256, 233, 42, 12]</code>。</p>
+<ul>
+<li>第一轮用桶排序时，以个位数为桶索引，依次处理原数组中的每个元素，得到这样的结果：<ul>
+<li>0号桶：<code>[100]</code></li>
+<li>1号桶：<code>[131]</code></li>
+<li>2号桶：<code>[42, 12]</code></li>
+<li>3号桶：<code>[233]</code></li>
+<li>6号桶：<code>[256]</code></li>
+</ul>
+</li>
+<li>第二轮用桶排序时，以十位数为桶索引，按照上一轮排序的结果，从0号桶开始，逐个处理这些元素，得到这样的结果：<ul>
+<li>0号桶：<code>[100]</code></li>
+<li>1号桶：<code>[12]</code></li>
+<li>3号桶：<code>[131, 233]</code></li>
+<li>4号桶：<code>[42]</code></li>
+<li>5号桶：<code>[256]</code></li>
+</ul>
+</li>
+<li>第三轮用桶排序时，以百位数为桶索引，按照上一轮排序的结果，从0号桶开始，逐个处理这些元素，得到这样的结果：<ul>
+<li>0号桶：<code>[12, 42]</code></li>
+<li>1号桶：<code>[100, 131]</code></li>
+<li>2号桶：<code>[233, 256]</code></li>
+</ul>
+</li>
+<li>最后，将几个桶中的所有元素依次取出来，形成的新数组即为排序好的数组。</li>
+</ul>
+<p>这个排序主要是用到了桶排序的稳定性。</p>
+<h2 id="快排"><a href="#快排" class="headerlink" title="快排"></a>快排</h2><p>快排，在不随机选择pivot的情况下，它的最好情况是O(NlogN)，最坏情况是O(N^2)。在随机选择pivot的情况下，它的平均时间复杂度是O(NlogN)。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">Patition</span><span class="params">(<span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt;&amp; nums, <span class="keyword">int</span> s, <span class="keyword">int</span> e)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">int</span> pivot = nums[e];</span><br><span class="line">    <span class="keyword">int</span> m = s<span class="number">-1</span>;</span><br><span class="line">    <span class="keyword">for</span>(<span class="keyword">int</span> i = s; i &lt; e; ++i)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">if</span>(nums[i]&lt;=pivot)</span><br><span class="line">        &#123;</span><br><span class="line">            ++m;</span><br><span class="line">            swap(nums[m], nums[i]);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    ++m;</span><br><span class="line">    swap(nums[m], nums[e]);</span><br><span class="line">    <span class="keyword">return</span> m;</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">QuickSortImpl</span><span class="params">(<span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt;&amp; nums, <span class="keyword">int</span> s, <span class="keyword">int</span> e)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">if</span>(s&gt;=e)</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line">    <span class="keyword">int</span> m = Patition(nums, s, e);</span><br><span class="line">    QuickSortImpl(nums, s, m<span class="number">-1</span>);</span><br><span class="line">    QuickSortImpl(nums, m+<span class="number">1</span>, e);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">QuickSort</span><span class="params">(<span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt;&amp; nums)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	QuickSortImpl(nums, <span class="number">0</span>, nums.<span class="built_in">size</span>()<span class="number">-1</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>优化：Patition函数在选择pivot时，随机选择一个数作为pivot，而不是直接使用开头或者结尾的数作为pivot。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">Patition</span><span class="params">(<span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt;&amp; nums, <span class="keyword">int</span> s, <span class="keyword">int</span> e)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">int</span> m = s<span class="number">-1</span>;</span><br><span class="line">    <span class="keyword">int</span> index = s+rand()%(e-s+<span class="number">1</span>);</span><br><span class="line">    <span class="comment">//将pivot放到结尾位置</span></span><br><span class="line">    swap(nums[index], nums[e]);</span><br><span class="line">    <span class="keyword">int</span> pivot = nums[e];</span><br><span class="line">    <span class="keyword">for</span>(<span class="keyword">int</span> i = s; i &lt; e; ++i)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">if</span>(nums[i]&lt;=pivot)</span><br><span class="line">        &#123;</span><br><span class="line">            ++m;</span><br><span class="line">            swap(nums[m], nums[i]);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">//将pivot置于数组分界点上</span></span><br><span class="line">    ++m;</span><br><span class="line">    swap(nums[m], nums[e]);</span><br><span class="line">    <span class="keyword">return</span> m;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>另一种方式是把pivot放到数组开头：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">Patition</span><span class="params">(<span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt;&amp; nums, <span class="keyword">int</span> s, <span class="keyword">int</span> e)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">int</span> m = s;</span><br><span class="line">    <span class="keyword">int</span> index = s+rand()%(e-s+<span class="number">1</span>);</span><br><span class="line">    <span class="comment">//将pivot置于数组开头</span></span><br><span class="line">    swap(nums[index], nums[s]);</span><br><span class="line">    <span class="keyword">int</span> pivot = nums[s];</span><br><span class="line">    <span class="keyword">for</span>(<span class="keyword">int</span> i = s+<span class="number">1</span>; i &lt;= e; ++i)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">if</span>(nums[i]&lt;=pivot)</span><br><span class="line">        &#123;</span><br><span class="line">            ++m;</span><br><span class="line">            swap(nums[m], nums[i]);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">//将pivot置于数组分界点上，注意，这里的m不用自增</span></span><br><span class="line">    swap(nums[m], nums[s]);</span><br><span class="line">    <span class="keyword">return</span> m;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>无论上面哪种写法，都要在最后将pivot置于数组分界点上，这是因为在QuickSort的递归中，分界点不参与下次递归过程，因此必须保证分界点上的数是pivot，否则排序会出错。</p>
+<p>将pivot置于开头还是结束，其实影响不大，在leetcode912的测试中，置于结束位置反而效果更好一些。理论上而言，二者的速度相同，可能是cache的原因。以全冷的cache为例，放在结尾的话，在放pivot的时候会有一次cache miss，在遍历开始的时候有一次cache miss， 在将pivot放置在分界点上时没有；放在开头的话，放pivot虽然也有cache miss，后续的遍历过程没有，将pivot放置在分界点上时有。</p>
+<p>这里只给出了单边遍历的patition，双边遍历更麻烦一些，而且得想清楚分界点是左边指针还是右边指针。单边遍历的话，不仅适用于数组，也适用于链表。</p>
+<h2 id="归并"><a href="#归并" class="headerlink" title="归并"></a>归并</h2><p>归并的时间复杂度是稳定的O(NlogN)，它的代价是要一个额外的buffer。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">Merge</span><span class="params">(<span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt;&amp; nums, <span class="keyword">int</span> s, <span class="keyword">int</span> m, <span class="keyword">int</span> e, <span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt; &amp; buf)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">int</span> k = s;</span><br><span class="line">    <span class="keyword">int</span> i = s, j = m+<span class="number">1</span>;</span><br><span class="line">    <span class="keyword">while</span>(i&lt;=m &amp;&amp; j&lt;=e)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">if</span>(nums[i] &lt;= nums[j])</span><br><span class="line">            buf[k++] = nums[i++];</span><br><span class="line">        <span class="keyword">else</span></span><br><span class="line">            buf[k++] = nums[j++];</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">while</span>(i&lt;=m)</span><br><span class="line">        buf[k++] = nums[i++];</span><br><span class="line">    <span class="keyword">while</span>(j&lt;=e)</span><br><span class="line">        buf[k++] = nums[j++];</span><br><span class="line">    copy(buf.<span class="built_in">begin</span>()+s, buf.<span class="built_in">begin</span>()+e+<span class="number">1</span>, nums.<span class="built_in">begin</span>()+s);</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">MergeSortImpl</span><span class="params">(<span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt;&amp; nums, <span class="keyword">int</span> s, <span class="keyword">int</span> e, <span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt; &amp; buf)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">if</span>(s&gt;=e)</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line">    <span class="keyword">int</span> m = s+(e-s)/<span class="number">2</span>;</span><br><span class="line">    MergeSortImpl(nums, s, m, buf);</span><br><span class="line">    MergeSortImpl(nums, m+<span class="number">1</span>, e, buf);</span><br><span class="line">    Merge(nums, s, m, e, buf);</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">MergeSort</span><span class="params">(<span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt;&amp; nums)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="function"><span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt; <span class="title">buf</span><span class="params">(nums.<span class="built_in">size</span>())</span></span>;</span><br><span class="line">    MergeSortImpl(nums, <span class="number">0</span>, nums.<span class="built_in">size</span>()<span class="number">-1</span>, buf);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>归并需要注意在merge时小心处理边界。另外，用于merge的buf最好一开始就分配好，每次用的时候来分配的话会在堆上有多余开销。另外，上面的归并排序其实效率不高，还有进一步的优化空间，比如每次merge完以后不止直接把数据从buffer copy回原数组，而是在buffer上再来一次merge，以这样的方式将数据copy回原数组。</p>
+<h2 id="堆排"><a href="#堆排" class="headerlink" title="堆排"></a>堆排</h2><p>堆排的时间复杂度是O(NlogN)。</p>
+<p>堆排序的思路在于不断地从堆顶取出最大值，放到数组尾部后。堆排序用的是完全二叉树，这可以用数组表示：对于一个父亲节点parent，它的左儿子节点为<code>2*parent+1</code>，右儿子节点为<code>2*parent+2</code>。另外，对于一个大小为N的数组来说，它的最后一个父亲节点的索引为<code>(N-2)/2</code>。</p>
+<p>根据这些条件，可以写出一版简陋但是还能work的heap sort。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">GotMax</span><span class="params">(<span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt;&amp; nums, <span class="keyword">int</span> parent, <span class="keyword">int</span> leftSon, <span class="keyword">int</span> rightSon, <span class="keyword">int</span> &amp; pos, <span class="keyword">int</span> N)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    pos = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">int</span> Mx = nums[parent];</span><br><span class="line">    <span class="keyword">if</span> (leftSon &lt; N &amp;&amp; Mx &lt; nums[leftSon])</span><br><span class="line">    &#123;</span><br><span class="line">        Mx = nums[leftSon];</span><br><span class="line">        pos = <span class="number">1</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> (rightSon &lt; N &amp;&amp; Mx &lt; nums[rightSon])</span><br><span class="line">    &#123;</span><br><span class="line">        pos = <span class="number">2</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">Adjust</span><span class="params">(<span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt;&amp; nums, <span class="keyword">int</span> parent, <span class="keyword">int</span> N)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">while</span> (parent &lt; N)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">int</span> leftSon = parent * <span class="number">2</span> + <span class="number">1</span>;</span><br><span class="line">        <span class="keyword">int</span> rightSon = parent * <span class="number">2</span> + <span class="number">2</span>;</span><br><span class="line">        <span class="keyword">int</span> MaxPos;</span><br><span class="line">        GotMax(nums, parent, leftSon, rightSon, MaxPos, N);</span><br><span class="line">        <span class="keyword">if</span> (MaxPos == <span class="number">0</span>)</span><br><span class="line">            <span class="keyword">break</span>;</span><br><span class="line">        <span class="keyword">else</span> <span class="keyword">if</span> (MaxPos == <span class="number">1</span>)</span><br><span class="line">        &#123;</span><br><span class="line">            swap(nums[parent], nums[leftSon]);</span><br><span class="line">            parent = leftSon;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">else</span></span><br><span class="line">        &#123;</span><br><span class="line">            swap(nums[parent], nums[rightSon]);</span><br><span class="line">            parent = rightSon;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">setUpHeap</span><span class="params">(<span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt;&amp; nums)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">int</span> N = nums.<span class="built_in">size</span>();</span><br><span class="line">    <span class="keyword">int</span> lastParent = (N<span class="number">-2</span>) / <span class="number">2</span>;</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = lastParent; i &gt;= <span class="number">0</span>; --i)</span><br><span class="line">    &#123;</span><br><span class="line">        Adjust(nums, i, N);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">heapSort</span><span class="params">(<span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt; &amp; nums)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    setUpHeap(nums);</span><br><span class="line">    <span class="keyword">int</span> N = nums.<span class="built_in">size</span>();</span><br><span class="line">    <span class="keyword">while</span> (N)</span><br><span class="line">    &#123;</span><br><span class="line">        swap(nums[<span class="number">0</span>], nums[N - <span class="number">1</span>]);</span><br><span class="line">        N--;</span><br><span class="line">        Adjust(nums, <span class="number">0</span>, N);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>核心在于Ajdust函数。堆排的实现思路如下：</p>
+<ul>
+<li>对于一个混乱的数组，首先将其调整为大顶堆(maxheap)</li>
+<li>接下来，不断将大顶堆的堆顶元素与堆的尾部进行交换，然后调整大顶堆，堆的大小也随之减少一，直到堆没有元素位置。</li>
+</ul>
+<p>不论是将数组调整为大顶堆，还是在大顶堆的堆顶元素弹出后，都需要调用Adjust函数进行调整。在上面的代码中，Adjust函数以parent为核心进行循环调整，导致代码较为丑陋。如果以左儿子为核心，代码就比较优雅了。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">Adjust</span><span class="params">(<span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt;&amp; nums, <span class="keyword">int</span> parent, <span class="keyword">int</span> N)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	<span class="keyword">int</span> leftSon = parent * <span class="number">2</span> + <span class="number">1</span>;</span><br><span class="line">	<span class="keyword">while</span> (leftSon &lt; N)</span><br><span class="line">	&#123;</span><br><span class="line">		<span class="keyword">if</span> (leftSon + <span class="number">1</span> &lt; N &amp;&amp; nums[leftSon] &lt; nums[leftSon + <span class="number">1</span>])</span><br><span class="line">			leftSon++;</span><br><span class="line">		<span class="keyword">if</span> (nums[parent] &lt; nums[leftSon])</span><br><span class="line">		&#123;</span><br><span class="line">			swap(nums[parent], nums[leftSon]);</span><br><span class="line">			parent = leftSon;</span><br><span class="line">			leftSon = parent * <span class="number">2</span> + <span class="number">1</span>;</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="keyword">else</span></span><br><span class="line">			<span class="keyword">break</span>;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>上面的代码中，第二个if语句其实可以把<code>else break</code>提到前面来，但是我并没有如此做，这是因为我希望通过if语句中小于判断提醒一下，排序是基于严格小于进行的。如果将<code>else break</code>提到前面，那么务必写<code>&gt;=</code>或者<code>!(xxx &lt; XXX)</code>。</p>
+<p>接下来，还能进行的优化是避免每次都使用swap。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">Adjust</span><span class="params">(<span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt;&amp; nums, <span class="keyword">int</span> hole, <span class="keyword">int</span> val, <span class="keyword">int</span> N)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	<span class="keyword">int</span> leftSon = hole * <span class="number">2</span> + <span class="number">1</span>;</span><br><span class="line">	<span class="keyword">while</span> (leftSon &lt; N)</span><br><span class="line">	&#123;</span><br><span class="line">		<span class="keyword">if</span> (leftSon + <span class="number">1</span> &lt; N &amp;&amp; nums[leftSon] &lt; nums[leftSon + <span class="number">1</span>])</span><br><span class="line">			leftSon++;</span><br><span class="line">		<span class="keyword">if</span> (val &lt; nums[leftSon])</span><br><span class="line">		&#123;</span><br><span class="line">			nums[hole] = nums[leftSon];</span><br><span class="line">			hole = leftSon;</span><br><span class="line">			leftSon = hole * <span class="number">2</span> + <span class="number">1</span>;</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="keyword">else</span></span><br><span class="line">			<span class="keyword">break</span>;</span><br><span class="line">	&#125;</span><br><span class="line">	nums[hole] = val;</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">setUpHeap</span><span class="params">(<span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt;&amp; nums)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	<span class="keyword">int</span> N = nums.<span class="built_in">size</span>();</span><br><span class="line">	<span class="keyword">int</span> lastParent = (N<span class="number">-2</span>) / <span class="number">2</span>;</span><br><span class="line">	<span class="keyword">for</span> (<span class="keyword">int</span> i = lastParent; i &gt;= <span class="number">0</span>; --i)</span><br><span class="line">	&#123;</span><br><span class="line">		Adjust(nums, i, nums[i], N);</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">heapSort</span><span class="params">(<span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt; &amp; nums)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	setUpHeap(nums);</span><br><span class="line">	<span class="keyword">int</span> N = nums.<span class="built_in">size</span>();</span><br><span class="line">	<span class="keyword">while</span> (N)</span><br><span class="line">	&#123;</span><br><span class="line">		<span class="keyword">int</span> val = nums[N - <span class="number">1</span>];</span><br><span class="line">		nums[N - <span class="number">1</span>] = nums[<span class="number">0</span>];</span><br><span class="line">		N--;</span><br><span class="line">		Adjust(nums, <span class="number">0</span>, val, N);</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>为了避免swap，需要做几个事情</p>
+<ul>
+<li>修改Adjust函数<ol>
+<li>它现在接受的参数不叫parent，而叫做hole了。</li>
+<li>它的参数中多了一个在调整结束后hole所在位置应该存放的值val。在setUpHeap函数中，这个值就是hole位置上的值。</li>
+<li>它在每次调整时仅用儿子的值覆盖父亲的值，而不是使用交换。作为收尾，在循环结束后，需要将val放置到hole位置上去。</li>
+</ol>
+</li>
+<li>在heapSort函数弹出堆顶元素时，也需要将swap进行相应的替换。</li>
+</ul>
+<p>本小节的堆排序参考了一篇<a href="https://blog.csdn.net/caroline_wendy/article/details/31357053" target="_blank" rel="noopener">博客</a></p>
+<h2 id="冒泡"><a href="#冒泡" class="headerlink" title="冒泡"></a>冒泡</h2><p>冒泡的时间复杂度是O(N^2)。这个算法在leetcode上会tle，所以我也没有完全测试过下面的代码到底有没有bug。不过这并不重要，正常情况下没人会用这个算法。</p>
+<p>冒泡的由来，是外层每一次循环完毕后，最大的数就会跑到数组尾部，就像冒泡一样。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt; <span class="title">sortArray</span><span class="params">(<span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt;&amp; nums)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">int</span> N = nums.<span class="built_in">size</span>();</span><br><span class="line">    <span class="keyword">bool</span> exchanged = <span class="literal">true</span>;</span><br><span class="line">    <span class="keyword">for</span>(<span class="keyword">int</span> i = <span class="number">0</span>; exchanged &amp;&amp; i &lt; N<span class="number">-1</span>; ++i)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">for</span>(<span class="keyword">int</span> j = <span class="number">0</span>; j &lt; N<span class="number">-1</span>-i; ++j)</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="keyword">if</span>(nums[j]&gt;nums[j+<span class="number">1</span>])</span><br><span class="line">            &#123;</span><br><span class="line">                swap(nums[j], nums[j+<span class="number">1</span>]);</span><br><span class="line">                exchanged = <span class="literal">true</span>;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> nums;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="选择"><a href="#选择" class="headerlink" title="选择"></a>选择</h2><p>这个其实和冒泡差不多，冒泡是每轮把最大的冒泡到数组尾巴上去，这个是每轮把最小的放到数组前面去。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt; <span class="title">sortArray</span><span class="params">(<span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt;&amp; nums)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">int</span> N = nums.<span class="built_in">size</span>();</span><br><span class="line">    <span class="keyword">for</span>(<span class="keyword">int</span> i = <span class="number">0</span>;i &lt; N<span class="number">-1</span>; ++i)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">int</span> Min = i;</span><br><span class="line">        <span class="keyword">for</span>(<span class="keyword">int</span> j = i+<span class="number">1</span>;j &lt; N; ++j)</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="keyword">if</span>(nums[j]&lt;nums[Min])</span><br><span class="line">                Min = j;</span><br><span class="line">        &#125;</span><br><span class="line">        swap(nums[i], nums[Min]);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> nums;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="插入"><a href="#插入" class="headerlink" title="插入"></a>插入</h2><p>插入排序是O(N^2)的。它的原理是当进行第i趟排序时，它前面的i个数已经有序了，我们要把当前的这个数插入到前面已经排序好的数组里面。维基上的这个解释非常形象：</p>
+<blockquote>
+<p>Insertion Sort 和打扑克牌时，从牌桌上逐一拿起扑克牌，在手上排序的过程相同。</p>
+<p>举例：</p>
+<p>Input: {5 2 4 6 1 3}。</p>
+<p>首先拿起第一张牌, 手上有 {5}。</p>
+<p>拿起第二张牌 2, 把 2 insert 到手上的牌 {5}, 得到 {2 5}。</p>
+<p>拿起第三张牌 4, 把 4 insert 到手上的牌 {2 5}, 得到 {2 4 5}。</p>
+</blockquote>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt; <span class="title">sortArray</span><span class="params">(<span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt;&amp; nums)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">int</span> N = nums.<span class="built_in">size</span>();</span><br><span class="line">    <span class="keyword">int</span> i,j,key;</span><br><span class="line">    <span class="keyword">for</span>(i = <span class="number">1</span>;i &lt; len;i++)&#123;</span><br><span class="line">            key = nums[i];</span><br><span class="line">            j = i<span class="number">-1</span>;</span><br><span class="line">            <span class="keyword">while</span>((j&gt;=<span class="number">0</span>) &amp;&amp; (nums[j]&gt;key)) &#123;</span><br><span class="line">                    nums[j+<span class="number">1</span>] = nums[j];</span><br><span class="line">                    j--;</span><br><span class="line">            &#125;</span><br><span class="line">            nums[j+<span class="number">1</span>] = key;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> nums;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>另外，它还有个变种，是在找插入位置时用二分法来找。但是，就算二分查找是O(logN)的，在插入时也需要逐个调整元素的位置，导致插入这个动作也是O(N)的，整体复杂度还是维持O(N^2)不变。</p>
+<h2 id="希尔排序"><a href="#希尔排序" class="headerlink" title="希尔排序"></a>希尔排序</h2><p>这个算法基本上没什么人关注。它是插入排序的改进版本，重点在于它的步长设置。这里略过。</p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><table>
+<thead>
+<tr>
+<th>算法</th>
+<th>时间复杂度</th>
+<th>inplace?</th>
+<th>稳定性</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>桶排序</td>
+<td>O(N)</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td>计数排序</td>
+<td>O(N)</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td>基数排序</td>
+<td>O(N)</td>
+<td>-</td>
+<td>是</td>
+</tr>
+<tr>
+<td>快排</td>
+<td>最好O(NlogN)，最差O(N^2),随机版本为O(NlogN)</td>
+<td>是</td>
+<td>否</td>
+</tr>
+<tr>
+<td>归并排序</td>
+<td>O(NlogN)</td>
+<td>否</td>
+<td>是</td>
+</tr>
+<tr>
+<td>堆排序</td>
+<td>O(NlogN)</td>
+<td>是</td>
+<td>否</td>
+</tr>
+<tr>
+<td>冒泡排序</td>
+<td>O(N^2)</td>
+<td>是</td>
+<td>是</td>
+</tr>
+<tr>
+<td>选择排序</td>
+<td>O(N^2)</td>
+<td>是</td>
+<td>否</td>
+</tr>
+<tr>
+<td>插入排序</td>
+<td>O(N^2)</td>
+<td>是</td>
+<td>是</td>
+</tr>
+<tr>
+<td>希尔排序</td>
+<td>最坏O(N^2)，改进后可到O(<em>n</em> (logn)^2)</td>
+<td>是</td>
+<td>否</td>
+</tr>
+</tbody></table>
+ 
+</div>
+            </div>
+        </div>
+        <div class="foot"><div id="footer">
+    <div class="theme-info">
+        <span>theme:<a href="https://github.com/12-th/ezread" target="_blank" rel="noopener">ezread</a></span>
+    </div>
+    <div class="about-me">
+        <span>想要给主题push request？<a href="https://github.com/12-th/" target="_blank" rel="noopener">contact me!!!!</a></span>
+    </div>
+</div> </div>
+    </div>
+    <div class="btn-to-top"><div id="btn-to-top">
+    <span id="btn-to-top">&#8679;</span>
+</div></div>
+</div>
+
+
+</body>
+
+</html>
