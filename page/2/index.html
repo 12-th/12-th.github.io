@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <script src="https://cdn.bootcss.com/jquery/3.1.0/jquery.min.js"></script>
+  
+<link rel="stylesheet" href="/css/layout.css">
+
+  <title>
+     
+      mq的小站 
+     
+  </title>
+<meta name="generator" content="Hexo 4.2.0"></head>
+
+<body>
+  
+<script src="/js/index.js"></script>
+
+
+<script src="/js/article.js"></script>
+
+
+<script src="/js/footer.js"></script>
+
+
+<script src="/js/sidebar.js"></script>
+
+
+<script src="/js/excerpt.js"></script>
+ 
+
+<script src="/js/header.js"></script>
+ 
+
+<link rel="stylesheet" href="/css/index.css">
+
+
+<link rel="stylesheet" href="/css/article.css">
+
+
+<link rel="stylesheet" href="/css/footer.css">
+
+
+<link rel="stylesheet" href="/css/sidebar.css">
+
+
+<link rel="stylesheet" href="/css/excerpt.css">
+ 
+
+<link rel="stylesheet" href="/css/header.css">
+ 
+<div class="sidebar"><div id="header">
+    <div id="sidebar">
+        <ul>
+            <a href="/">主页</a>
+            <a href="/archives">归档</a>
+            <a href="/categories ">分类</a>
+            <a href="/tags">tag</a>
+        </ul>
+    </div>
+    <div id="mask"></div>
+    <span id="btn-sidebar">&#9776;</span>
+</div></div>
+<div class="index-grid">
+    <div><div id="website-info">
+    <div id="site-strings" style="display:none">逝者如斯夫，不舍昼夜,上善若水，水利万物而不争,hello，world,山水不度我，琴声不渡江,啦啦啦啦啦啦~~~</div>
+    <div><span id="site-tittle">mq的小站</span></div>
+    <div><span id="site-description"></span></div>
+</div> </div>
+    <div id="articles">
+        <div></div>
+        <div id="article-list">
+            
+                
+                <div class="excerpt">
+    <div class="excerpt-data">
+        <div class="excerpt-tittle"><span>在访问内存时发生了什么</span></div>
+        <div class="excerpt-text"><div class="article-text">
+    <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">int</span> * pa;</span><br><span class="line">...<span class="comment">//对pa进行初始化</span></span><br><span class="line"><span class="keyword">int</span> a = *pa;</span><br></pre></td></tr></table></figure>
+
+<p>一行简单的访问地址的代码，背后到底经历了哪些复杂的步骤。</p>
+<p>以linux系统和x86cpu为例，让我们来探究一下访问内存区域的全过程。</p>
+<p>简单来说，分为以下几步：</p>
+<ul>
+<li>首先，需要进行地址转换，因为现代cpu大部分时候运行在保护模式下。<ul>
+<li>首先是分段机制，通过段表来将逻辑地址转换为线性地址</li>
+<li>然后是分页机制，通过页表将线性地址转换为物理地址</li>
+<li>在转换的过程中，还会涉及到TLB</li>
+</ul>
+</li>
+<li>现在，cpu得到了物理地址，通过该物理地址进行访问，这会涉及到cache</li>
+<li>在上面的过程中，还会遇到非法地址访问或者page fault的问题，这需要交给内核进行处理。</li>
+</ul>
+<p>接下来，从上面描述到的各个步骤来深挖一下里面涉及到的东西。不过，说是深挖，但是涉及到的东西太多了，也只能浅尝辄止。</p> 
+</div></div>
+    </div>
+    <div><a class="excerpt-div-more" href="/2019/08/15/%E8%AE%BF%E9%97%AE%E5%9C%B0%E5%9D%80%E6%B5%81%E7%A8%8B/%E8%AE%BF%E9%97%AE%E5%9C%B0%E5%9D%80%E6%B5%81%E7%A8%8B/">>>></a></div>
+</div>
+                
+            
+        </div>
+        <div></div>
+    </div>
+    <div id="pageinator"><a class="extend prev" rel="prev" href="/">&lt;</a><a class="page-number" href="/">1</a><span class="page-number current">2</span></div>
+    <div class="foot">
+        <div id="footer">
+    <div class="theme-info">
+        <span>theme:<a href="https://github.com/12-th/ezread" target="_blank" rel="noopener">ezread</a></span>
+    </div>
+    <div class="about-me">
+        <span>想要给主题push request？<a href="https://github.com/12-th/" target="_blank" rel="noopener">contact me!!!!</a></span>
+    </div>
+</div>
+    </div>
+</div>
+</body>
+
+</html>

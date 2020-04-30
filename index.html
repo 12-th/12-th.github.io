@@ -77,6 +77,21 @@
                 
                 <div class="excerpt">
     <div class="excerpt-data">
+        <div class="excerpt-tittle"><span>链表排序</span></div>
+        <div class="excerpt-text"><div class="article-text">
+    <p>链表的排序和数组的排序原理是一样的，只是在细节上有所不同。这里简要记录一下链表的快排、归并和插入排序的写法。</p>
+<h2 id="测试数据"><a href="#测试数据" class="headerlink" title="测试数据"></a>测试数据</h2><p>以leetcode 148作测试。</p>
+<p>链表节点的定义如下，没有额外的 头节点。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">ListNode</span> &#123;</span></span><br><span class="line">    <span class="keyword">int</span> val;</span><br><span class="line">    ListNode *next;</span><br><span class="line">    ListNode(<span class="keyword">int</span> x) : val(x), next(<span class="literal">NULL</span>) &#123;&#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure> 
+</div></div>
+    </div>
+    <div><a class="excerpt-div-more" href="/2020/04/29/%E9%93%BE%E8%A1%A8%E6%8E%92%E5%BA%8F/">>>></a></div>
+</div>
+                
+            
+                
+                <div class="excerpt">
+    <div class="excerpt-data">
         <div class="excerpt-tittle"><span>hexo主题开发简要指南</span></div>
         <div class="excerpt-text"><div class="article-text">
     <p>next主题虽然好看，但是实在是烂大街了，而且我更喜欢像word的那种可以折叠的目录。正好这段时间比较闲，所以我决定自己写个hexo主题，提不提交到hexo官方倒是其次，关键用自己写的主题心里舒服。</p>
@@ -221,37 +236,10 @@
 </div>
                 
             
-                
-                <div class="excerpt">
-    <div class="excerpt-data">
-        <div class="excerpt-tittle"><span>在访问内存时发生了什么</span></div>
-        <div class="excerpt-text"><div class="article-text">
-    <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">int</span> * pa;</span><br><span class="line">...<span class="comment">//对pa进行初始化</span></span><br><span class="line"><span class="keyword">int</span> a = *pa;</span><br></pre></td></tr></table></figure>
-
-<p>一行简单的访问地址的代码，背后到底经历了哪些复杂的步骤。</p>
-<p>以linux系统和x86cpu为例，让我们来探究一下访问内存区域的全过程。</p>
-<p>简单来说，分为以下几步：</p>
-<ul>
-<li>首先，需要进行地址转换，因为现代cpu大部分时候运行在保护模式下。<ul>
-<li>首先是分段机制，通过段表来将逻辑地址转换为线性地址</li>
-<li>然后是分页机制，通过页表将线性地址转换为物理地址</li>
-<li>在转换的过程中，还会涉及到TLB</li>
-</ul>
-</li>
-<li>现在，cpu得到了物理地址，通过该物理地址进行访问，这会涉及到cache</li>
-<li>在上面的过程中，还会遇到非法地址访问或者page fault的问题，这需要交给内核进行处理。</li>
-</ul>
-<p>接下来，从上面描述到的各个步骤来深挖一下里面涉及到的东西。不过，说是深挖，但是涉及到的东西太多了，也只能浅尝辄止。</p> 
-</div></div>
-    </div>
-    <div><a class="excerpt-div-more" href="/2019/08/15/%E8%AE%BF%E9%97%AE%E5%9C%B0%E5%9D%80%E6%B5%81%E7%A8%8B/%E8%AE%BF%E9%97%AE%E5%9C%B0%E5%9D%80%E6%B5%81%E7%A8%8B/">>>></a></div>
-</div>
-                
-            
         </div>
         <div></div>
     </div>
-    <div id="pageinator"><span class="page-number current">1</span></div>
+    <div id="pageinator"><span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><a class="extend next" rel="next" href="/page/2/">&gt;</a></div>
     <div class="foot">
         <div id="footer">
     <div class="theme-info">
